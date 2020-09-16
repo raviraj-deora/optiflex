@@ -1,7 +1,14 @@
 //import 'dart:convert';
+import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:math';
+
+import 'package:optiflexcalculator/utils/app_colors.dart';
+import 'package:optiflexcalculator/utils/validation_utils.dart';
+
+import 'calculation_screen.dart';
+import 'data_model.dart';
 //import 'package:horizontal_data_table/horizontal_data_table.dart';
 //import 'package:http/http.dart' as http;
 
@@ -22,76 +29,7 @@ class Calculate extends StatelessWidget {
   }
 }
 
-class Data {
-  String namepass;
-  String birthdatepass;
-  String idpass;
-  String doctornamepass;
-  String datepass;
-  String eyepass;
-  String flatk;
-  String steepk;
-  String preofsphpass;
-  String preofcylpass;
-  String corthkpass;
-  String backvertaxpass;
-  String wtwpass;
-  String acdpass;
-  String iolmodelpass;
-  String firstvalueofspherepass,
-      secondvalueofspherepass,
-      middlevalueofspherepass,
-      fourthvalueofspgerepass,
-      fifthvalueofspherepass,
-      selectedvalueofcylinderpass,
-      firstvalueofresidualspherepass,
-      secondvalueofresidualspherepass,
-      middlevalueofresidualspherepass,
-      fourthvalueofresidualspherepass,
-      fifthvalueofresidualspherepass,
-      valueofresidualcylinderpass,
-      firstvalueofsphericalequivalentpass,
-      secondvalueofsphericalequivalentpass,
-      middlevalueofsphericalequivalentpass,
-      fourthvalueofsphericalequivalentpass,
-      fifthvalueofsphericalequivalentpass,
-      axisofplacementpass;
 
-  Data(
-      {this.namepass,
-      this.birthdatepass,
-      this.idpass,
-      this.doctornamepass,
-      this.datepass,
-      this.eyepass,
-      this.flatk,
-      this.steepk,
-      this.preofsphpass,
-      this.preofcylpass,
-      this.corthkpass,
-      this.backvertaxpass,
-      this.wtwpass,
-      this.acdpass,
-      this.iolmodelpass,
-      this.firstvalueofspherepass,
-      this.selectedvalueofcylinderpass,
-      this.secondvalueofspherepass,
-      this.middlevalueofspherepass,
-      this.fourthvalueofspgerepass,
-      this.fifthvalueofspherepass,
-      this.firstvalueofresidualspherepass,
-      this.secondvalueofresidualspherepass,
-      this.middlevalueofresidualspherepass,
-      this.fourthvalueofresidualspherepass,
-      this.fifthvalueofresidualspherepass,
-      this.valueofresidualcylinderpass,
-      this.firstvalueofsphericalequivalentpass,
-      this.secondvalueofsphericalequivalentpass,
-      this.middlevalueofsphericalequivalentpass,
-      this.fourthvalueofsphericalequivalentpass,
-      this.fifthvalueofsphericalequivalentpass,
-      this.axisofplacementpass});
-}
 
 // Create a Form widget.
 class MyCustomForm extends StatefulWidget {
@@ -129,6 +67,7 @@ class MyCustomFormState extends State<MyCustomForm> {
   final acdController = TextEditingController();
   // final dobController = TextEditingController();
   String radioItem = '';
+  bool isLeftSelect = false;
 
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
@@ -139,7 +78,8 @@ class MyCustomFormState extends State<MyCustomForm> {
     if (picked != null && picked != selectedDate)
       setState(() {
         selectedDate = picked;
-        _date.value = TextEditingValue(text: picked.toString().split(' ')[0]);
+        //print(formatDate(selectedDate, [dd, '/', mm, '/', yyyy]));
+        _date.value = TextEditingValue(text: formatDate(selectedDate, [dd, '/', mm, '/', yyyy]));
       });
   }
 
@@ -152,7 +92,7 @@ class MyCustomFormState extends State<MyCustomForm> {
     if (picked != null && picked != selectedDate)
       setState(() {
         selectedDate = picked;
-        _date2.value = TextEditingValue(text: picked.toString().split(' ')[0]);
+        _date2.value = TextEditingValue(text: formatDate(selectedDate, [dd, '/', mm, '/', yyyy]));
       });
   }
 
@@ -265,12 +205,15 @@ class MyCustomFormState extends State<MyCustomForm> {
     double diffaxisofk1 = (kaxisofRefractivePower - k1axis).abs();
     double diffaxisofk2 = (kaxisofRefractivePower - k2axis).abs();
     if (diffaxisofk1 < diffaxisofk2) {
+      print("1....");
       rkref = k1float;
     }
     if (diffaxisofk2 < diffaxisofk1) {
+      print("2....");
       rkref = k2float;
     }
     if (SameRValues == true) {
+      print("3....");
       rkref = [k1float, k2float].reduce(max);
     }
 // $kref = kref
@@ -733,6 +676,8 @@ class MyCustomFormState extends State<MyCustomForm> {
     //print(k2axisfloat);
   }
 
+  TextStyle headingStyle = TextStyle(fontSize: 16);
+
   @override
   Widget build(BuildContext context) {
     // Build a Form widget using the _formKey created above.
@@ -747,24 +692,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                 flex: 10, // 20%
                 child: Column(
                   children: <Widget>[
-                    Container(
-                      color: Colors.grey[350],
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text("Patient Details".toUpperCase(),
-                                    style: TextStyle(color: Colors.blue[900])),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    _headingWidget("Patient Details"),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
@@ -803,6 +731,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                               children: <Widget>[
                                 TextFormField(
                                   controller: nameController,
+                                  validator: ValidationUtils.validateName,
                                   decoration: InputDecoration(
                                       hintText: 'Please enter your name',
                                       labelText: 'Name'),
@@ -824,15 +753,20 @@ class MyCustomFormState extends State<MyCustomForm> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
+                                SizedBox(height: 10,),
+                                Text("Date Of Birth",style: headingStyle,),
                                 GestureDetector(
                                   onTap: () => _selectDate(context),
                                   child: AbsorbPointer(
                                     child: TextFormField(
                                       controller: _date,
+                                      validator: (value){
+                                        return ValidationUtils.validateEmpty(value, "Date Of Birth");
+                                      },
                                       keyboardType: TextInputType.datetime,
                                       decoration: InputDecoration(
-                                          hintText: 'Date of Birth',
-                                          labelText: 'Date of Birth'),
+                                          hintText: 'DD/MM/YYYY',
+                                          labelText: 'DD/MM/YYYY'),
                                     ),
                                   ),
                                 ),
@@ -853,11 +787,16 @@ class MyCustomFormState extends State<MyCustomForm> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
+                                SizedBox(height: 10,),
+                                Text("Patient\'s ID",style: headingStyle,),
                                 TextFormField(
                                   controller: patientidController,
+                                  validator: (value){
+                                    return ValidationUtils.validateEmpty(value, "Patient\'s ID");
+                                  },
                                   decoration: InputDecoration(
                                       hintText: 'Please enter patient\'s id',
-                                      labelText: 'Patient\'s ID'),
+                                      labelText: 'Patient Case No.'),
                                 ),
                               ],
                             ),
@@ -876,11 +815,16 @@ class MyCustomFormState extends State<MyCustomForm> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
+                                SizedBox(height: 10,),
+                                Text("Docotor\'s Name",style: headingStyle,),
                                 TextFormField(
                                   controller: doctornameController,
+                                  validator: (value){
+                                    return ValidationUtils.validateEmpty(value, "Docotor\'s Name");
+                                  },
                                   decoration: InputDecoration(
                                       hintText: 'Please enter docotor\'s name',
-                                      labelText: 'Docotor\'s Name'),
+                                      labelText: 'Anirudh'),
                                 ),
                               ],
                             ),
@@ -899,14 +843,19 @@ class MyCustomFormState extends State<MyCustomForm> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
+                                SizedBox(height: 10,),
+                                Text("Date",style: headingStyle,),
                                 GestureDetector(
                                   onTap: () => _selectDate2(context),
                                   child: AbsorbPointer(
                                     child: TextFormField(
                                       controller: _date2,
+                                      validator: (value){
+                                        return ValidationUtils.validateEmpty(value, "Date");
+                                      },
                                       keyboardType: TextInputType.datetime,
                                       decoration: InputDecoration(
-                                          hintText: 'Date', labelText: 'Date'),
+                                          hintText: 'Date', labelText: 'DD/MM/YYYY'),
                                     ),
                                   ),
                                 ),
@@ -916,62 +865,35 @@ class MyCustomFormState extends State<MyCustomForm> {
                         ),
                       ],
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        Expanded(
-                          flex: 10, // 80%
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                RadioListTile(
-                                  groupValue: radioItem,
-                                  title: Text('Right-eye OD',
-                                      style: TextStyle(fontSize: 15.0)),
-                                  value: 'right-eye',
-                                  onChanged: (val) {
-                                    setState(() {
-                                      radioItem = val;
-                                    });
-                                  },
-                                ),
-                                RadioListTile(
-                                  groupValue: radioItem,
-                                  title: Text('Left-eye OD'),
-                                  value: 'left-eye',
-                                  onChanged: (val) {
-                                    setState(() {
-                                      radioItem = val;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      color: Colors.grey[350],
+                    Padding(
+                      padding: const EdgeInsets.only(right: 10),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text("Pre-operative Data".toUpperCase(),
-                                    style: TextStyle(color: Colors.blue[900])),
-                              ],
-                            ),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                isLeftSelect = !isLeftSelect;
+                              });
+                            },
+                            icon: Icon(isLeftSelect?Icons.brightness_1:Icons.panorama_fish_eye,color: AppColors.themeColor,),
                           ),
+                          Text("Right eye-OD"),
+                          Expanded(child: Container(),),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                isLeftSelect = !isLeftSelect;
+                              });
+                            },
+                            icon: Icon(!isLeftSelect?Icons.brightness_1:Icons.panorama_fish_eye,color: AppColors.themeColor,),
+                          ),
+                          Text("Left eye-OS"),
+
                         ],
                       ),
                     ),
+                    _headingWidget("pre-operative data"),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
@@ -983,11 +905,22 @@ class MyCustomFormState extends State<MyCustomForm> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
+                                SizedBox(height: 10,),
+                                Row(
+                                    children: [
+                                      Text("K1",style: headingStyle,),
+                                      Text("*",style:TextStyle(color: Colors.red),),
+                                    ],
+                                ),
                                 TextFormField(
                                   controller: k1Controller,
+                                  validator: (value){
+                                    print("value = $value");
+                                    return ValidationUtils.validatePosField(35, 60,value, "k1");
+                                  },
                                   decoration: InputDecoration(
                                       hintText: 'Please enter value of K1',
-                                      labelText: 'K1'),
+                                      labelText: '(35.00 D to 60.00 D)'),
                                 ),
                               ],
                             ),
@@ -1006,11 +939,22 @@ class MyCustomFormState extends State<MyCustomForm> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
+                                SizedBox(height: 10,),
+                                Row(
+                                  children: [
+                                    Text("Axis of K1",style: headingStyle,),
+                                    Text("*",style:TextStyle(color: Colors.red),),
+                                  ],
+                                ),
                                 TextFormField(
                                   controller: k1axisController,
+                                  validator: (value){
+                                    print("value= $value");
+                                    return ValidationUtils.validateDigree(k1axisController.text, "Axis of k1");
+                                  },
                                   decoration: InputDecoration(
                                       hintText: '0° to 180°',
-                                      labelText: 'Axis of K1'),
+                                      labelText: '(0° to 180°)'),
                                 ),
                               ],
                             ),
@@ -1029,11 +973,22 @@ class MyCustomFormState extends State<MyCustomForm> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
+                                SizedBox(height: 10,),
+                                Row(
+                                  children: [
+                                    Text("K2",style: headingStyle,),
+                                    Text("*",style:TextStyle(color: Colors.red),),
+                                  ],
+                                ),
                                 TextFormField(
                                   controller: k2Controller,
+                                  validator: (value){
+                                    print("value = $value");
+                                    return ValidationUtils.validatePosField(35, 60,value, "k2");
+                                  },
                                   decoration: InputDecoration(
                                       hintText: 'Please enter value of K2',
-                                      labelText: 'K2'),
+                                      labelText: '(35.00 D to 60.00 D)'),
                                 ),
                               ],
                             ),
@@ -1052,11 +1007,22 @@ class MyCustomFormState extends State<MyCustomForm> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
+                                SizedBox(height: 10,),
+                                Row(
+                                  children: [
+                                    Text("Axis of K2",style: headingStyle,),
+                                    Text("*",style:TextStyle(color: Colors.red),),
+                                  ],
+                                ),
                                 TextFormField(
                                   controller: k2axisController,
+                                  validator: (value){
+                                    print("value = $value");
+                                    return ValidationUtils.validateDigree(value, "Axis of k2");
+                                  },
                                   decoration: InputDecoration(
                                       hintText: '0° to 180°',
-                                      labelText: 'Axis of K2'),
+                                      labelText: '(0° to 180)'),
                                 ),
                               ],
                             ),
@@ -1075,11 +1041,22 @@ class MyCustomFormState extends State<MyCustomForm> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
+                                SizedBox(height: 10,),
+                                Row(
+                                  children: [
+                                    Text("Pre-Operative Sphere",style: headingStyle,),
+                                    Text("*",style:TextStyle(color: Colors.red),),
+                                  ],
+                                ),
                                 TextFormField(
                                   controller: preopsphController,
+                                  validator: (value){
+                                    print("value = $value");
+                                    return ValidationUtils.validateField(-1,-25,value, "Pre-Operative Sphere");
+                                  },
                                   decoration: InputDecoration(
                                       hintText: '-1.0D to -25.0D',
-                                      labelText: 'Pre-Operative Sphere'),
+                                      labelText: '-1.0D to -25.0D'),
                                 ),
                               ],
                             ),
@@ -1098,11 +1075,21 @@ class MyCustomFormState extends State<MyCustomForm> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
+                                SizedBox(height: 10,),
+                                Row(
+                                  children: [
+                                    Text("Pre-Operative Cylinder",style: headingStyle,),
+                                    Text("*",style:TextStyle(color: Colors.red),),
+                                  ],
+                                ),
                                 TextFormField(
                                   controller: preopcylController,
+                                  validator: (value){
+                                    return ValidationUtils.validateCylinder(value, "Pre-Perative Cylinder");
+                                  },
                                   decoration: InputDecoration(
                                       hintText: '-10.0D to +10.0D',
-                                      labelText: 'Pre-Operative Cylinder'),
+                                      labelText: '-10.0D to +10.0D'),
                                 ),
                               ],
                             ),
@@ -1121,12 +1108,23 @@ class MyCustomFormState extends State<MyCustomForm> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
+                                SizedBox(height: 10,),
+                                Row(
+                                  children: [
+                                    Text("Axis Of Pre-Operative Cylinder",style: headingStyle,),
+                                    Text("*",style:TextStyle(color: Colors.red),),
+                                  ],
+                                ),
                                 TextFormField(
                                   controller: preopcylaxisController,
+                                  validator: (value){
+                                    print("value = $value");
+                                    return ValidationUtils.validateDigree(value, "Axis Of Pre-Operative Cylinder");
+                                  },
                                   decoration: InputDecoration(
                                       hintText: '0° to 180°',
                                       labelText:
-                                          'Axis Of Pre-Operative Cylinder'),
+                                          '(0° to 180)'),
                                 ),
                               ],
                             ),
@@ -1145,11 +1143,22 @@ class MyCustomFormState extends State<MyCustomForm> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
+                                SizedBox(height: 10,),
+                                Row(
+                                  children: [
+                                    Text("Corneal Thickness",style: headingStyle,),
+                                    Text("*",style:TextStyle(color: Colors.red),),
+                                  ],
+                                ),
                                 TextFormField(
                                   controller: corthkController,
+                                  validator: (value){
+                                    print("value = $value");
+                                    return ValidationUtils.validateDoubleField(0.25,0.70,value, "Axis Of Pre-Operative Cylinder");
+                                  },
                                   decoration: InputDecoration(
                                       hintText: '0.25mm to 0.70mm',
-                                      labelText: 'Corneal Thickness'),
+                                      labelText: '0.25mm to 0.70mm'),
                                 ),
                               ],
                             ),
@@ -1168,12 +1177,20 @@ class MyCustomFormState extends State<MyCustomForm> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
+                                SizedBox(height: 10,),
+                                Row(
+                                  children: [
+                                    Text("Back Vertex Distance(in mm)",style: headingStyle,),
+                                    Text("*",style:TextStyle(color: Colors.red),),
+                                  ],
+                                ),
                                 TextFormField(
                                   // controller: vertaxController,
                                   initialValue: '12',
                                   decoration: InputDecoration(
                                       hintText: '0.25mm to 0.70mm',
-                                      labelText: 'Back Vertex Distance(in mm)'),
+                                      //labelText: 'Back Vertex Distance(in mm)'
+                                  ),
                                 ),
                               ],
                             ),
@@ -1192,36 +1209,31 @@ class MyCustomFormState extends State<MyCustomForm> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                Text(
-                                    'White to White Distance(10.5mm to 12.6mm)'),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        Expanded(
-                          flex: 10, // 80%
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
+                                SizedBox(height: 10,),
+                                Row(
+                                  children: [
+                                    Text("White to White Distance",style: headingStyle,),
+                                    Text("*",style:TextStyle(color: Colors.red),),
+                                  ],
+                                ),
                                 TextFormField(
                                   controller: wtwmanualController,
+                                  validator: (value){
+                                    print("value = $value");
+                                    return ValidationUtils.validateDoubleField(10.5,12.6,value, "White to White Distance");
+                                  },
                                   decoration: InputDecoration(
-                                      hintText: '', labelText: 'Manual'),
+                                      hintText: '',
+                                      labelText: '10.5mm to 12.6mm'),
                                 ),
+
                               ],
                             ),
                           ),
                         ),
                       ],
                     ),
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
@@ -1233,33 +1245,23 @@ class MyCustomFormState extends State<MyCustomForm> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                TextFormField(
-                                  controller: wtworbscanController,
-                                  decoration: InputDecoration(
-                                      hintText: '', labelText: 'ORBSCAN'),
+                                SizedBox(height: 10,),
+                                Row(
+                                  children: [
+                                    Text("Anterior Chamber Depth",style: headingStyle,),
+                                    Text("*",style:TextStyle(color: Colors.red),),
+                                    Text("(From Endothelium)",style: TextStyle(fontSize: 12,color: Colors.grey),),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        Expanded(
-                          flex: 10, // 80%
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
                                 TextFormField(
                                   controller: acdController,
+                                  validator: (value){
+                                    print("value = $value");
+                                    return ValidationUtils.validateDoubleField(2.80,4.5,value, "Anterior Chamber Depth");
+                                  },
                                   decoration: InputDecoration(
                                       hintText: '2.80mm to 4.50mm',
-                                      labelText: 'Anterior Chamber Depth'),
+                                      labelText: '2.80mm to 4.50mm'),
                                 ),
                               ],
                             ),
@@ -1267,6 +1269,8 @@ class MyCustomFormState extends State<MyCustomForm> {
                         ),
                       ],
                     ),
+
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
@@ -1282,10 +1286,12 @@ class MyCustomFormState extends State<MyCustomForm> {
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 16.0),
                                   child: RaisedButton(
+                                    color: AppColors.themeColor,
                                     onPressed: () {
                                       // Validate returns true if the form is valid, or false
                                       // otherwise.
                                       if (_formKey.currentState.validate()) {
+                                        print("form validate");
                                         // If the form is valid, display a Snackbar.
                                         Scaffold.of(context).showSnackBar(
                                             SnackBar(
@@ -1294,7 +1300,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                                         calculateData();
                                       }
                                     },
-                                    child: Text('Calculate'),
+                                    child: Text('Calculate',style: TextStyle(color: Colors.white),),
                                   ),
                                 ),
                               ],
@@ -1312,1086 +1318,53 @@ class MyCustomFormState extends State<MyCustomForm> {
       ),
     );
   }
-}
-
-class CalculationScreen extends StatefulWidget {
-  final Data data;
-
-  CalculationScreen({this.data});
-  @override
-  CalculationScreenState createState() {
-    return CalculationScreenState(
-      data: data,
+  Widget _headingWidget(String text){
+    return Container(
+      alignment: Alignment.center,
+      width: double.infinity,
+      color: AppColors.themeColor,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(text.toUpperCase(),
+            style: TextStyle(color: Colors.white)),
+      ),
+    );
+  }
+  Widget _oldRadioWidget(){
+    return Expanded(
+      flex: 10, // 80%
+      child: Padding(
+        padding:
+        const EdgeInsets.only(left: 8.0, right: 8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            RadioListTile(
+              groupValue: radioItem,
+              title: Text('Right-eye OD',
+                  style: TextStyle(fontSize: 15.0)),
+              value: 'right-eye',
+              onChanged: (val) {
+                setState(() {
+                  radioItem = val;
+                });
+              },
+            ),
+            RadioListTile(
+              groupValue: radioItem,
+              title: Text('Left-eye OD'),
+              value: 'left-eye',
+              onChanged: (val) {
+                setState(() {
+                  radioItem = val;
+                });
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
 
-class CalculationScreenState extends State<CalculationScreen> {
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
-  String radioValue1;
-  final Data data;
-  String radioItem = '';
-  CalculationScreenState({this.data});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(title: Text('Optiflex Calculators')),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 10,
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        color: Colors.grey[350],
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Patient Details".toUpperCase(),
-                                      style:
-                                          TextStyle(color: Colors.blue[900])),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Patient's Name:",
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text('${data.namepass}',
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Patient's Birthdate:",
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text('${data.birthdatepass}',
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Patient´s Case No. / ID No.:",
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text('${data.idpass}',
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Doctor's Name:",
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text('${data.doctornamepass}',
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Date:",
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text('${data.datepass}',
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Eye:",
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text('${data.eyepass}',
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 10, // 100%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        color: Colors.grey[350],
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Pre-operative Data".toUpperCase(),
-                                      style:
-                                          TextStyle(color: Colors.blue[900])),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Flat K:",
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text('${data.flatk}',
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Steep K:",
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text('${data.steepk}',
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Pre-Operative Sphere:",
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text('${data.preofsphpass}',
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Pre-Operative Cylinder:",
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text('${data.preofcylpass}',
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Corneal Thickness(in mm):",
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text('${data.corthkpass}',
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Back Vertex Distance(in mm):",
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text('${data.backvertaxpass}',
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("White to White Distance(in mm):",
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text('${data.wtwpass}',
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Anterior Chamber Depth(in mm):",
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text('${data.acdpass}',
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 10, // 100%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        color: Colors.grey[350],
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Calculation Details".toUpperCase(),
-                                      style:
-                                          TextStyle(color: Colors.blue[900])),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("IOL Model Size(in mm):",
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5, // 50%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text('${data.iolmodelpass}',
-                                      style: TextStyle(color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 10, // 100%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 10.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        color: Colors.grey[350],
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Select Power Of Lens".toUpperCase(),
-                                      style:
-                                          TextStyle(color: Colors.blue[900])),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.symmetric(vertical: 20.0),
-                        height: 315,
-                        child: ListView(
-                            scrollDirection: Axis.horizontal,
-                            children: <Widget>[
-                              Column(
-                                children: <Widget>[
-                                  Row(
-                                    children: <Widget>[
-                                      Center(
-                                          child: Text(
-                                        'Select Power Of Lens'.toUpperCase(),
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold),
-                                      )),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      DataTable(
-                                        columns: [
-                                          DataColumn(label: Text('')),
-                                          DataColumn(label: Text('SPHERE')),
-                                          DataColumn(label: Text('CYLINDER')),
-                                        ],
-                                        rows: [
-                                          DataRow(cells: [
-                                            DataCell(Container(
-                                              width: 10,
-                                              child: Radio(
-                                                value:
-                                                    '${data.firstvalueofspherepass}',
-                                                groupValue: radioItem,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    radioItem = val;
-                                                  });
-                                                },
-                                              ),
-                                            )),
-                                            DataCell(Text(
-                                                '${data.firstvalueofspherepass}')),
-                                            DataCell(Text(
-                                                '${data.selectedvalueofcylinderpass}')),
-                                          ]),
-                                          DataRow(cells: [
-                                            DataCell(Container(
-                                              width: 10,
-                                              child: Radio(
-                                                value:
-                                                    '${data.secondvalueofspherepass}',
-                                                groupValue: radioItem,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    radioItem = val;
-                                                  });
-                                                },
-                                              ),
-                                            )),
-                                            DataCell(Text(
-                                                '${data.secondvalueofspherepass}')),
-                                            DataCell(Text(
-                                                '${data.selectedvalueofcylinderpass}')),
-                                          ]),
-                                          DataRow(cells: [
-                                            DataCell(Container(
-                                              width: 10,
-                                              child: Radio(
-                                                value:
-                                                    '${data.middlevalueofspherepass}',
-                                                groupValue: radioItem,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    radioItem = val;
-                                                  });
-                                                },
-                                              ),
-                                            )),
-                                            DataCell(Text(
-                                                '${data.middlevalueofspherepass}')),
-                                            DataCell(Text(
-                                                '${data.selectedvalueofcylinderpass}')),
-                                          ]),
-                                          DataRow(cells: [
-                                            DataCell(Container(
-                                              width: 10,
-                                              child: Radio(
-                                                value:
-                                                    '${data.fourthvalueofspgerepass}',
-                                                groupValue: radioItem,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    radioItem = val;
-                                                  });
-                                                },
-                                              ),
-                                            )),
-                                            DataCell(Text(
-                                                '${data.fourthvalueofspgerepass}')),
-                                            DataCell(Text(
-                                                '${data.selectedvalueofcylinderpass}')),
-                                          ]),
-                                          DataRow(cells: [
-                                            DataCell(Container(
-                                              width: 10,
-                                              child: Radio(
-                                                value:
-                                                    '${data.fifthvalueofspherepass}',
-                                                groupValue: radioItem,
-                                                onChanged: (val) {
-                                                  setState(() {
-                                                    radioItem = val;
-                                                  });
-                                                },
-                                              ),
-                                            )),
-                                            DataCell(Text(
-                                                '${data.fifthvalueofspherepass}')),
-                                            DataCell(Text(
-                                                '${data.selectedvalueofcylinderpass}')),
-                                          ]),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                children: <Widget>[
-                                  Row(
-                                    children: <Widget>[
-                                      Center(
-                                          child: Text(
-                                        'Expected Post-Op Residual'
-                                            .toUpperCase(),
-                                        style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold),
-                                      )),
-                                    ],
-                                  ),
-                                  Row(
-                                    children: <Widget>[
-                                      DataTable(
-                                        columns: [
-                                          DataColumn(label: Text('SPHERE')),
-                                          DataColumn(label: Text('CYLINDER')),
-                                          DataColumn(
-                                              label:
-                                                  Text('SPHERICAL EQUIVALENT')),
-                                          DataColumn(label: Text('AXIS')),
-                                        ],
-                                        rows: [
-                                          DataRow(cells: [
-                                            DataCell(Text(
-                                                '${data.firstvalueofresidualspherepass}')),
-                                            DataCell(Text(
-                                                '${data.valueofresidualcylinderpass}')),
-                                            DataCell(Text(
-                                                '${data.firstvalueofsphericalequivalentpass}')),
-                                            DataCell(Text(
-                                                '${data.axisofplacementpass}')),
-                                          ]),
-                                          DataRow(cells: [
-                                            DataCell(Text(
-                                                '${data.secondvalueofresidualspherepass}')),
-                                            DataCell(Text(
-                                                '${data.valueofresidualcylinderpass}')),
-                                            DataCell(Text(
-                                                '${data.secondvalueofsphericalequivalentpass}')),
-                                            DataCell(Text(
-                                                '${data.axisofplacementpass}')),
-                                          ]),
-                                          DataRow(cells: [
-                                            DataCell(Text(
-                                                '${data.middlevalueofresidualspherepass}')),
-                                            DataCell(Text(
-                                                '${data.valueofresidualcylinderpass}')),
-                                            DataCell(Text(
-                                                '${data.middlevalueofsphericalequivalentpass}')),
-                                            DataCell(Text(
-                                                '${data.axisofplacementpass}')),
-                                          ]),
-                                          DataRow(cells: [
-                                            DataCell(Text(
-                                                '${data.fourthvalueofresidualspherepass}')),
-                                            DataCell(Text(
-                                                '${data.valueofresidualcylinderpass}')),
-                                            DataCell(Text(
-                                                '${data.fourthvalueofsphericalequivalentpass}')),
-                                            DataCell(Text(
-                                                '${data.axisofplacementpass}')),
-                                          ]),
-                                          DataRow(cells: [
-                                            DataCell(Text(
-                                                '${data.fifthvalueofresidualspherepass}')),
-                                            DataCell(Text(
-                                                '${data.valueofresidualcylinderpass}')),
-                                            DataCell(Text(
-                                                '${data.fifthvalueofsphericalequivalentpass}')),
-                                            DataCell(Text(
-                                                '${data.axisofplacementpass}')),
-                                          ]),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ]),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 10, // 100%
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 5.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        color: Colors.grey[350],
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text(
-                                      "Select Cylinder of Glaze Axis Lens"
-                                          .toUpperCase(),
-                                      style:
-                                          TextStyle(color: Colors.blue[900])),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5,
-                            child: ListTile(
-                              title: const Text('0.5'),
-                              leading: Radio(
-                                value: '0.5',
-                                groupValue: radioValue1,
-                                onChanged: (val) {
-                                  setState(() {
-                                    radioValue1 = val;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5,
-                            child: ListTile(
-                              title: const Text('3.0'),
-                              leading: Radio(
-                                value: '3.0',
-                                groupValue: radioValue1,
-                                onChanged: (val) {
-                                  setState(() {
-                                    radioValue1 = val;
-                                  });
-                                },
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5,
-                            child: ListTile(
-                              title: const Text('1.0'),
-                              leading: Radio(
-                                value: '1.0',
-                                groupValue: radioValue1,
-                                onChanged: (val) {
-                                  setState(() {
-                                    radioValue1 = val;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5,
-                            child: ListTile(
-                              title: const Text('3.5'),
-                              leading: Radio(
-                                value: '3.5',
-                                groupValue: radioValue1,
-                                onChanged: (val) {
-                                  setState(() {
-                                    radioValue1 = val;
-                                  });
-                                },
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5,
-                            child: ListTile(
-                              title: const Text('1.5'),
-                              leading: Radio(
-                                value: '1.5',
-                                groupValue: radioValue1,
-                                onChanged: (val) {
-                                  setState(() {
-                                    radioValue1 = val;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5,
-                            child: ListTile(
-                              title: const Text('4.0'),
-                              leading: Radio(
-                                value: '4.0',
-                                groupValue: radioValue1,
-                                onChanged: (val) {
-                                  setState(() {
-                                    radioValue1 = val;
-                                  });
-                                },
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5,
-                            child: ListTile(
-                              title: const Text('2.0'),
-                              leading: Radio(
-                                value: '2.0',
-                                groupValue: radioValue1,
-                                onChanged: (val) {
-                                  setState(() {
-                                    radioValue1 = val;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5,
-                            child: ListTile(
-                              title: const Text('4.5'),
-                              leading: Radio(
-                                value: '4.5',
-                                groupValue: radioValue1,
-                                onChanged: (val) {
-                                  setState(() {
-                                    radioValue1 = val;
-                                  });
-                                },
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            flex: 5,
-                            child: ListTile(
-                              title: const Text('2.5'),
-                              leading: Radio(
-                                value: '2.5',
-                                groupValue: radioValue1,
-                                onChanged: (val) {
-                                  setState(() {
-                                    radioValue1 = val;
-                                  });
-                                },
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 5,
-                            child: ListTile(
-                              title: const Text('5.0'),
-                              leading: Radio(
-                                value: '5.0',
-                                groupValue: radioValue1,
-                                onChanged: (val) {
-                                  setState(() {
-                                    radioValue1 = val;
-                                  });
-                                },
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            flex: 10, // 80%
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 8.0, right: 8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16.0),
-                                    child: RaisedButton(
-                                      onPressed: () {
-                                        // Validate returns true if the form is valid, or false
-                                        // otherwise.
 
-                                        // If the form is valid, display a Snackbar.
-                                        _scaffoldKey.currentState.showSnackBar(
-                                            SnackBar(
-                                                content:
-                                                    Text('Processing Data')));
-                                        finalResults();
-                                      },
-                                      child: Text('Submit'),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
-        ));
-  }
-
-  Future finalResults() async {
-    print("Test called");
-  }
-}
