@@ -1,42 +1,60 @@
 import 'package:flutter/material.dart';
+import 'package:optiflexcalculator/result_screen.dart';
 import 'package:optiflexcalculator/utils/app_colors.dart';
+import 'package:optiflexcalculator/utils/common_utils.dart';
 
-import 'data_model.dart';
+import 'model/data_model.dart';
 
 class CalculationScreen extends StatefulWidget {
   final Data data;
 
-  CalculationScreen({this.data});
+  CalculationScreen(this.data);
   @override
   CalculationScreenState createState() {
-    return CalculationScreenState(
-      data: data,
-    );
+    return CalculationScreenState(this.data);
   }
 }
 
 class CalculationScreenState extends State<CalculationScreen> {
+
+  Data data;
+  CalculationScreenState(this.data);
+
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   String radioValue1;
-  final Data data;
   String radioItem = '';
-  CalculationScreenState({this.data});
   bool isPhacikLens = false;
   int expectedCylinderIndex = 0;
 
   List<PowerOfLens> powerOfLensList = [];
   List<ExpectedSpherical> expectedSphericalList = [];
-  double cylinderValue = 0.5;
-  List<double> expectedCylinder = [8.83,8.43,8.02,7.62,7.21,6.81,6.40,6.00,5.59,5.19];
+  double cylinderValue;
+  List<double> expectedCylinder = [];
   List<PhakicToricLense> phakicToricLenseList = [];
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    cylinderValue = data.selectedvalueofcylinderpass;
+
     resetList();
   }
   resetList(){
+    expectedCylinder.clear();
+    expectedCylinder.add(data.valueofresidualcylinderpass);
+    expectedCylinder.add(data.valueofresidualcylinderpass-(0.4*1));
+    expectedCylinder.add(data.valueofresidualcylinderpass-(0.4*2));
+    expectedCylinder.add(data.valueofresidualcylinderpass-(0.4*3));
+    expectedCylinder.add(data.valueofresidualcylinderpass-(0.4*4));
+    expectedCylinder.add(data.valueofresidualcylinderpass-(0.4*5));
+    expectedCylinder.add(data.valueofresidualcylinderpass-(0.4*6));
+    expectedCylinder.add(data.valueofresidualcylinderpass-(0.4*7));
+    expectedCylinder.add(data.valueofresidualcylinderpass-(0.4*8));
+    expectedCylinder.add(data.valueofresidualcylinderpass-(0.4*9));
+
+
     phakicToricLenseList.clear();
     phakicToricLenseList.add(new PhakicToricLense(false,0.5));
     phakicToricLenseList.add(new PhakicToricLense(false,1.0));
@@ -50,23 +68,29 @@ class CalculationScreenState extends State<CalculationScreen> {
     phakicToricLenseList.add(new PhakicToricLense(false,5.0));
 
     expectedSphericalList.clear();
-    expectedSphericalList.add(new ExpectedSpherical(4.03,4.42,4.83,5.24,5.64 ));
-    expectedSphericalList.add(new ExpectedSpherical(3.82,4.22,4.63,5.04,5.45 ));
-    expectedSphericalList.add(new ExpectedSpherical(3.62,4.02,4.43 ,4.83 ,5.24 ));
-    expectedSphericalList.add(new ExpectedSpherical(3.42,3.82 ,4.23 ,4.63 ,5.04 ));
-    expectedSphericalList.add(new ExpectedSpherical(3.21,3.61,4.03,4.42,4.83 ));
-    expectedSphericalList.add(new ExpectedSpherical(3.01,3.41,3.82,4.22,4.63));
-    expectedSphericalList.add(new ExpectedSpherical(2.81,3.21,3.62,4.02,4.43));
-    expectedSphericalList.add(new ExpectedSpherical(2.61,3.01,3.42,3.82,4.23));
-    expectedSphericalList.add(new ExpectedSpherical(2.40,2.80,3.21,3.61,4.03));
-    expectedSphericalList.add(new ExpectedSpherical(2.21,2.60,3.0,3.42,3.83));
+    double first = data.firstvalueofsphericalequivalentpass;
+    double second = data.secondvalueofsphericalequivalentpass;
+    double middle =  data.middlevalueofsphericalequivalentpass;
+    double fourth = data.fourthvalueofsphericalequivalentpass;
+    double fifth = data.fifthvalueofsphericalequivalentpass;
+
+    expectedSphericalList.add(new ExpectedSpherical(first,second,middle,fourth,fifth ));
+    expectedSphericalList.add(new ExpectedSpherical(first-(0.2*1),second-(0.2*1),middle-(0.2*1),fourth-(0.2*1),fifth-(0.2*1) ));
+    expectedSphericalList.add(new ExpectedSpherical(first-(0.2*2),second-(0.2*2),middle-(0.2*2),fourth-(0.2*2),fifth-(0.2*2)));
+    expectedSphericalList.add(new ExpectedSpherical(first-(0.2*3),second-(0.2*3),middle-(0.2*3),fourth-(0.2*3),fifth-(0.2*3) ));
+    expectedSphericalList.add(new ExpectedSpherical(first-(0.2*4),second-(0.2*4),middle-(0.2*4),fourth-(0.2*4),fifth-(0.2*4) ));
+    expectedSphericalList.add(new ExpectedSpherical(first-(0.2*5),second-(0.2*5),middle-(0.2*5),fourth-(0.2*5),fifth-(0.2*5)));
+    expectedSphericalList.add(new ExpectedSpherical(first-(0.2*6),second-(0.2*6),middle-(0.2*6),fourth-(0.2*6),fifth-(0.2*6)));
+    expectedSphericalList.add(new ExpectedSpherical(first-(0.2*7),second-(0.2*7),middle-(0.2*7),fourth-(0.2*7),fifth-(0.2*7)));
+    expectedSphericalList.add(new ExpectedSpherical(first-(0.2*8),second-(0.2*8),middle-(0.2*8),fourth-(0.2*8),fifth-(0.2*8)));
+    expectedSphericalList.add(new ExpectedSpherical(first-(0.2*9),second-(0.2*9),middle-(0.2*9),fourth-(0.2*9),fifth-(0.2*9)));
 
     powerOfLensList.clear();
-    powerOfLensList.add(new PowerOfLens(false,-3, cylinderValue,-0.39 ,expectedCylinder[expectedCylinderIndex] ,expectedSphericalList[expectedCylinderIndex].value1 ,40 ));
-    powerOfLensList.add(new PowerOfLens(false,-3.5,cylinderValue,0.01 ,expectedCylinder[expectedCylinderIndex] ,expectedSphericalList[expectedCylinderIndex].value2 ,40 ));
-    powerOfLensList.add(new PowerOfLens(false,-4,cylinderValue,0.42 ,expectedCylinder[expectedCylinderIndex] , expectedSphericalList[expectedCylinderIndex].value3,40 ));
-    powerOfLensList.add(new PowerOfLens(false,-4.5,cylinderValue ,0.82 , expectedCylinder[expectedCylinderIndex],expectedSphericalList[expectedCylinderIndex].value4 ,40 ));
-    powerOfLensList.add(new PowerOfLens(false,-5, cylinderValue,1.23 , expectedCylinder[expectedCylinderIndex],expectedSphericalList[expectedCylinderIndex].value5 ,40 ));
+    powerOfLensList.add(new PowerOfLens(false,data.firstvalueofspherepass, cylinderValue,data.firstvalueofresidualspherepass ,expectedCylinder[expectedCylinderIndex] ,expectedSphericalList[expectedCylinderIndex].value1 ,data.axisofplacementpass ));
+    powerOfLensList.add(new PowerOfLens(false,data.secondvalueofspherepass,cylinderValue,data.secondvalueofresidualspherepass ,expectedCylinder[expectedCylinderIndex] ,expectedSphericalList[expectedCylinderIndex].value2 ,data.axisofplacementpass ));
+    powerOfLensList.add(new PowerOfLens(false,data.middlevalueofspherepass,cylinderValue,data.middlevalueofresidualspherepass ,expectedCylinder[expectedCylinderIndex] , expectedSphericalList[expectedCylinderIndex].value3,data.axisofplacementpass ));
+    powerOfLensList.add(new PowerOfLens(false,data.fourthvalueofspgerepass,cylinderValue ,data.fourthvalueofresidualspherepass , expectedCylinder[expectedCylinderIndex],expectedSphericalList[expectedCylinderIndex].value4 ,data.axisofplacementpass ));
+    powerOfLensList.add(new PowerOfLens(false,data.fifthvalueofspherepass, cylinderValue,data.fifthvalueofresidualspherepass, expectedCylinder[expectedCylinderIndex],expectedSphericalList[expectedCylinderIndex].value5 ,data.axisofplacementpass ));
   }
   @override
   Widget build(BuildContext context) {
@@ -82,25 +106,7 @@ class CalculationScreenState extends State<CalculationScreen> {
                   flex: 10,
                   child: Column(
                     children: <Widget>[
-                      Container(
-                        color: Colors.grey[350],
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Patient Details".toUpperCase(),
-                                      style:
-                                      TextStyle(color: Colors.blue[900])),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      Common.headingWidget("Patient Details"),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
@@ -301,25 +307,8 @@ class CalculationScreenState extends State<CalculationScreen> {
                           ),
                         ],
                       ),
-                      Container(
-                        color: Colors.grey[350],
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Pre-operative Data".toUpperCase(),
-                                      style:
-                                      TextStyle(color: Colors.blue[900])),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      Common.headingWidget("Pre-operative Data"),
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
@@ -582,25 +571,8 @@ class CalculationScreenState extends State<CalculationScreen> {
                           ),
                         ],
                       ),
-                      Container(
-                        color: Colors.grey[350],
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Calculation Details".toUpperCase(),
-                                      style:
-                                      TextStyle(color: Colors.blue[900])),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      Common.headingWidget("Calculation Details"),
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
@@ -646,25 +618,7 @@ class CalculationScreenState extends State<CalculationScreen> {
                           ),
                         ],
                       ),
-                      Container(
-                        color: Colors.grey[350],
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Select Power Of Lens".toUpperCase(),
-                                      style:
-                                      TextStyle(color: Colors.blue[900])),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      Common.headingWidget("Select Power Of Lens"),
                       powerLensWidget(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -685,23 +639,8 @@ class CalculationScreenState extends State<CalculationScreen> {
                         ],
                       ),
 
-                      Container(
-                        color: Color(0xffCEEDC4),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text("Select cylinder of phakic lens".toUpperCase()),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      Common.headingWidget("Select cylinder of phakic lens"),
+
                       grid(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -973,7 +912,7 @@ class CalculationScreenState extends State<CalculationScreen> {
         ),
 
         Container(
-          color: Colors.grey[350],
+          color: AppColors.themeGreyColor,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
@@ -1386,7 +1325,7 @@ class CalculationScreenState extends State<CalculationScreen> {
         ),
 
         Container(
-          color: Colors.grey[350],
+          color: AppColors.themeGreyColor,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
@@ -1587,7 +1526,7 @@ class CalculationScreenState extends State<CalculationScreen> {
         child: Column(
           children: [
             Container(
-              color: Color(0xffCEEDC4),
+              color: AppColors.themeGreyColor,
               width: 600,
               child: Padding(
                 padding: const EdgeInsets.all(5.0),
@@ -1595,17 +1534,17 @@ class CalculationScreenState extends State<CalculationScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(),
-                    Text("SELECTED POWER OF LENS"),
+                    Text("SELECTED POWER OF LENS",style: TextStyle(color: AppColors.themeColor),),
                     Container(width: 2,height: 40,color: Colors.white,),
                     Container(),
-                    Text("EXPECTED POST_OP RESIDUAL"),
+                    Text("EXPECTED POST_OP RESIDUAL",style: TextStyle(color: AppColors.themeColor)),
                     Container(),
                   ],
                 ),
               ),
             ),
             Container(
-              color: Colors.grey[350],
+              color: AppColors.themeGreyColor,
               width: 600,
               child: Padding(
                 padding: const EdgeInsets.all(5.0),
@@ -1614,15 +1553,15 @@ class CalculationScreenState extends State<CalculationScreen> {
                   children: [
                     Container(),
                     Container(),
-                    Text("SPHERE"),
+                    Text("SPHERE",style: TextStyle(color: AppColors.themeColor)),
                     Container(),
                     Container(),
-                    Text("CYLINDER"),
+                    Text("CYLINDER",style: TextStyle(color: AppColors.themeColor)),
                     Container(),
-                    Text("SPHERE"),
-                    Text("CYLINDER"),
-                    Text("SPHERICAL"),
-                    Text("AXIS"),
+                    Text("SPHERE",style: TextStyle(color: AppColors.themeColor)),
+                    Text("CYLINDER",style: TextStyle(color: AppColors.themeColor)),
+                    Text("SPHERICAL",style: TextStyle(color: AppColors.themeColor)),
+                    Text("AXIS",style: TextStyle(color: AppColors.themeColor)),
                     Container(),
                     //Container(width: 2,height: 40,color: Colors.white,),
 
@@ -1652,7 +1591,7 @@ class CalculationScreenState extends State<CalculationScreen> {
           child: Column(
             children: [
               Container(
-                color: Colors.grey[200],
+                color: AppColors.themeGreyColor,
                 child: Row(
                   //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -1668,15 +1607,15 @@ class CalculationScreenState extends State<CalculationScreen> {
                       },
                     ),
                     SizedBox(width: 10,),
-                    Text(powerOfLens.sphere1.toString()),
+                    Text(powerOfLens.sphere1.abs().toString()),
                     SizedBox(width: 110,),
-                    Text(powerOfLens.cylinder1.toString()),
+                    Text(powerOfLens.cylinder1.abs().toString()),
                     SizedBox(width: 80,),
-                    Text(powerOfLens.sphere2.toString()),
+                    Text(powerOfLens.sphere2.abs().toString()),
                     SizedBox(width: 45,),
-                    Text(powerOfLens.cylinder2.toString()),
+                    Text(powerOfLens.cylinder2.abs().toString()),
                     SizedBox(width: 65,),
-                    Text(powerOfLens.spherical.toString()),
+                    Text(powerOfLens.spherical.abs().toString()),
                     SizedBox(width: 50,),
                     Text(powerOfLens.axis.toString()),
                   ],
@@ -1691,6 +1630,12 @@ class CalculationScreenState extends State<CalculationScreen> {
   }
   Future finalResults() async {
     print("Test called");
+                  Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ResultScreen(this.data),
+                ),
+              );
   }
   Widget grid(){
     return GridView.builder(
@@ -1703,7 +1648,7 @@ class CalculationScreenState extends State<CalculationScreen> {
             (MediaQuery.of(context).size.height / 6),),
       itemBuilder: (BuildContext context, int index) {
         return new Card(
-          color: Colors.grey[200],
+          color: AppColors.themeGreyColor,
           child: new Row(
             children: [
           IconButton(

@@ -5,10 +5,11 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:optiflexcalculator/utils/app_colors.dart';
+import 'package:optiflexcalculator/utils/common_utils.dart';
 import 'package:optiflexcalculator/utils/validation_utils.dart';
 
 import 'calculation_screen.dart';
-import 'data_model.dart';
+import 'model/data_model.dart';
 //import 'package:horizontal_data_table/horizontal_data_table.dart';
 //import 'package:http/http.dart' as http;
 
@@ -69,20 +70,122 @@ class MyCustomFormState extends State<MyCustomForm> {
   String radioItem = '';
   bool isLeftSelect = false;
 
+  String dateMessage = "Age of this patient is outside our recommended age group.Click Continue to Proceddd.";
+
+  int popCount = 0;
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
         context: context,
         initialDate: selectedDate,
         firstDate: DateTime(1901, 1),
         lastDate: DateTime(2100));
-    if (picked != null && picked != selectedDate)
-      setState(() {
-        selectedDate = picked;
-        //print(formatDate(selectedDate, [dd, '/', mm, '/', yyyy]));
-        _date.value = TextEditingValue(text: formatDate(selectedDate, [dd, '/', mm, '/', yyyy]));
-      });
-  }
+    int yearDiff = DateTime.now().year - selectedDate.year;
+    print("yearDiff = $yearDiff");
+    if(yearDiff<28 || yearDiff>45){
+      datePopup();
+    }
 
+    if (picked != null && picked != selectedDate)
+      {
+        print("submit....");
+        setState(() {
+          selectedDate = picked;
+          //print(formatDate(selectedDate, [dd, '/', mm, '/', yyyy]));
+          _date.value = TextEditingValue(text: formatDate(selectedDate, [dd, '/', mm, '/', yyyy]));
+        });
+      }
+  }
+  datePopup(){
+    return showDialog(
+      barrierDismissible: false,
+        context: context,
+        builder: (BuildContext subContext) {
+          return AlertDialog(
+            content:Text(dateMessage),
+            actions: <Widget>[
+              FlatButton(child: Text('CONTINUE'),
+                  onPressed: () {
+                    Navigator.pop(subContext);
+                  }),
+
+            ],
+          );
+        });
+  }
+  submitPOpup1(){
+    return showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext subContext) {
+          return AlertDialog(
+            content:Text("The corneal cylinder and refractive cylinder do not match. Click Continue to Confirm or Cancel to change values."),
+            actions: <Widget>[
+              FlatButton(child: Text('CONTINUE'),
+                  onPressed: () {
+                    Navigator.pop(subContext);
+                  }),
+              FlatButton(child: Text('CANCEL'),
+                  onPressed: () {
+                    Navigator.pop(subContext);
+                  }),
+            ],
+          );
+        });
+  }
+  k1k2Popup2(){
+    popCount++;
+    return showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext subContext) {
+          return AlertDialog(
+            content:Text("The axis of K1 and k2 are not 90 degrees apart. Click Continue to Confirm or Cancel to change values."),
+            actions: <Widget>[
+              FlatButton(child: Text('CONTINUE'),
+                  onPressed: () {
+                    popHide(subContext);
+                  }),
+              FlatButton(child: Text('CANCEL'),
+                  onPressed: () {
+                    popHide(subContext);
+                  }),
+            ],
+          );
+        });
+  }
+  AnteriorChamberPopup(){
+    popCount++;
+    return showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext subContext) {
+          return AlertDialog(
+            content:Text("The entered value for Anterior Chamber Depth is >3.5mm."),
+            actions: <Widget>[
+              FlatButton(child: Text('CONTINUE'),
+                  onPressed: () {
+                    popHide(subContext);
+                  }),
+              FlatButton(child: Text('CANCEL'),
+                  onPressed: () {
+                    popHide(subContext);
+                  }),
+            ],
+          );
+        });
+  }
+  popHide(BuildContext subContext){
+    Navigator.pop(subContext);
+    popCount--;
+    print("popCount = $popCount");
+    if(popCount==0){
+      calculateData();
+      Scaffold.of(context).showSnackBar(
+          SnackBar(
+              content:
+              Text('Processing Data')));
+    }
+  }
   Future<Null> _selectDate2(BuildContext context) async {
     final DateTime picked = await showDatePicker(
         context: context,
@@ -643,41 +746,46 @@ class MyCustomFormState extends State<MyCustomForm> {
         wtwpass: wtw.toString(),
         acdpass: acdfloat.toString(),
         iolmodelpass: size_of_phakic,
-        firstvalueofspherepass: firstvalueofspehere.toString(),
-        secondvalueofspherepass: secondvalueofspehere.toString(),
-        middlevalueofspherepass: middlevalueofspehere.toString(),
-        fourthvalueofspgerepass: fourthvalueofspehere.toString(),
-        fifthvalueofspherepass: fifthvalueofspehere.toString(),
-        selectedvalueofcylinderpass: selectedvalueofcylinder.toString(),
-        firstvalueofresidualspherepass: firstvalueofresidualsphere.toString(),
-        secondvalueofresidualspherepass: secondvalueofresidualsphere.toString(),
-        middlevalueofresidualspherepass: middlevalueofresidualsphere.toString(),
-        fourthvalueofresidualspherepass: fourthvalueofresidualsphere.toString(),
-        fifthvalueofresidualspherepass: fifthvalueofresidualsphere.toString(),
-        valueofresidualcylinderpass: valueofresidualcylinder.toString(),
+        firstvalueofspherepass: firstvalueofspehere,
+        secondvalueofspherepass: secondvalueofspehere,
+        middlevalueofspherepass: middlevalueofspehere,
+        fourthvalueofspgerepass: fourthvalueofspehere,
+        fifthvalueofspherepass: fifthvalueofspehere,
+        selectedvalueofcylinderpass: selectedvalueofcylinder,
+        firstvalueofresidualspherepass: firstvalueofresidualsphere,
+        secondvalueofresidualspherepass: secondvalueofresidualsphere,
+        middlevalueofresidualspherepass: middlevalueofresidualsphere,
+        fourthvalueofresidualspherepass: fourthvalueofresidualsphere,
+        fifthvalueofresidualspherepass: fifthvalueofresidualsphere,
+        valueofresidualcylinderpass: valueofresidualcylinder,
         firstvalueofsphericalequivalentpass:
-            firstvalueofsphericalequivalent.toString(),
+            firstvalueofsphericalequivalent,
         secondvalueofsphericalequivalentpass:
-            secondvalueofsphericalequivalent.toString(),
+            secondvalueofsphericalequivalent,
         middlevalueofsphericalequivalentpass:
-            middlevalueofsphericalequivalent.toString(),
+            middlevalueofsphericalequivalent,
         fourthvalueofsphericalequivalentpass:
-            fourthvalueofsphericalequivalent.toString(),
+            fourthvalueofsphericalequivalent,
         fifthvalueofsphericalequivalentpass:
-            fifthvalueofsphericalequivalent.toString(),
-        axisofplacementpass: axisofplacement.toString());
+            fifthvalueofsphericalequivalent,
+        axisofplacementpass: axisofplacement);
 
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => CalculationScreen(
-                  data: data,
-                )));
+            builder: (context) => CalculationScreen(data,)));
     //print(k2axisfloat);
   }
 
   TextStyle headingStyle = TextStyle(fontSize: 16);
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    doctornameController.text = "Anirudh";
+  }
   @override
   Widget build(BuildContext context) {
     // Build a Form widget using the _formKey created above.
@@ -692,7 +800,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                 flex: 10, // 20%
                 child: Column(
                   children: <Widget>[
-                    _headingWidget("Patient Details"),
+                    Common.headingWidget("Patient Details"),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
@@ -893,7 +1001,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                         ],
                       ),
                     ),
-                    _headingWidget("pre-operative data"),
+                    Common.headingWidget("pre-operative data"),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
@@ -1250,7 +1358,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                                   children: [
                                     Text("Anterior Chamber Depth",style: headingStyle,),
                                     Text("*",style:TextStyle(color: Colors.red),),
-                                    Text("(From Endothelium)",style: TextStyle(fontSize: 12,color: Colors.grey),),
+                                    Text("(From Endothelium)",style: TextStyle(fontSize: 12,color: AppColors.themeGreyColor),),
                                   ],
                                 ),
                                 TextFormField(
@@ -1293,11 +1401,19 @@ class MyCustomFormState extends State<MyCustomForm> {
                                       if (_formKey.currentState.validate()) {
                                         print("form validate");
                                         // If the form is valid, display a Snackbar.
-                                        Scaffold.of(context).showSnackBar(
-                                            SnackBar(
-                                                content:
-                                                    Text('Processing Data')));
-                                        calculateData();
+                                        //submitPOpup1();
+
+                                        double k2Val = double.parse(k2Controller.text.trim());
+                                        double k1Val = double.parse(k1Controller.text.trim());
+                                        double k1k2Diff = k2Val - k1Val;
+                                        if(k1k2Diff!=90){
+                                          k1k2Popup2();
+                                        }
+
+                                        double acdValue = double.parse(acdController.text.trim());
+                                        if(acdValue>3.5){
+                                          AnteriorChamberPopup();
+                                        }
                                       }
                                     },
                                     child: Text('Calculate',style: TextStyle(color: Colors.white),),
@@ -1318,18 +1434,7 @@ class MyCustomFormState extends State<MyCustomForm> {
       ),
     );
   }
-  Widget _headingWidget(String text){
-    return Container(
-      alignment: Alignment.center,
-      width: double.infinity,
-      color: AppColors.themeColor,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Text(text.toUpperCase(),
-            style: TextStyle(color: Colors.white)),
-      ),
-    );
-  }
+
   Widget _oldRadioWidget(){
     return Expanded(
       flex: 10, // 80%

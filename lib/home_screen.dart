@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:optiflexcalculator/AgrreeAndContinue/agree_and_continue_screen.dart';
 
 import 'calculate.dart';
 
@@ -8,7 +9,7 @@ class HomeScreen extends StatelessWidget {
     Navigator.of(ctx).push(
       MaterialPageRoute(
         builder: (_) {
-          return Calculate();
+          return AgreeAndContinueScreen();
         },
       ),
     );

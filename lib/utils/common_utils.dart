@@ -4,6 +4,18 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'app_colors.dart';
 
 class Common {
+  static Widget headingWidget(String text){
+    return Container(
+      alignment: Alignment.center,
+      width: double.infinity,
+      color: AppColors.themeGreyColor,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(text.toUpperCase(),
+            style: TextStyle(color:AppColors.themeColor)),
+      ),
+    );
+  }
   static void showErrorToastMsg(String txt) {
     Fluttertoast.showToast(
         msg: "$txt",

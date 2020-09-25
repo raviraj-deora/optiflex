@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 class AppColors {
 
 //  static const Color bubblegumPinkColor = Color(0xffE9738D);
-  static const Color greyColor = Colors.grey;
-  static const Color themeColor = Color(0Xff86D345);//Color(0xffe34234 )
+  static const Color greyColor = AppColors.themeGreyColor;
+  static const Color themeColor = Color(0Xff234C5A);//Color(0xffe34234 )
   //static const Color themeLightColor = Color(0XffFE642E);//
-  static const Color themePurpleColor = Color(0Xff7B4C75);
+  static const Color themeGreyColor = Color(0XffD2D3D5);
 
   static const Color nebulosityBlackColor = Color(0xff1C1C1B);
   //static const Color greenColor = Colors.green;

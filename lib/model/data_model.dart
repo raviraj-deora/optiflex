@@ -14,7 +14,7 @@ class Data {
   String wtwpass;
   String acdpass;
   String iolmodelpass;
-  String firstvalueofspherepass,
+  double firstvalueofspherepass,
       secondvalueofspherepass,
       middlevalueofspherepass,
       fourthvalueofspgerepass,
@@ -31,7 +31,7 @@ class Data {
       middlevalueofsphericalequivalentpass,
       fourthvalueofsphericalequivalentpass,
       fifthvalueofsphericalequivalentpass,
-      axisofplacementpass;
+      axisofplacementpass,iolPowerSelected;
 
   Data(
       {this.namepass,
@@ -66,5 +66,5 @@ class Data {
         this.middlevalueofsphericalequivalentpass,
         this.fourthvalueofsphericalequivalentpass,
         this.fifthvalueofsphericalequivalentpass,
-        this.axisofplacementpass});
+        this.axisofplacementpass,this.iolPowerSelected});
 }
