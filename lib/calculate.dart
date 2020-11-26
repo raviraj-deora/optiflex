@@ -769,6 +769,12 @@ class MyCustomFormState extends State<MyCustomForm> {
         fifthvalueofsphericalequivalentpass:
             fifthvalueofsphericalequivalent,
         axisofplacementpass: axisofplacement);
+    if(!isLeftSelect){
+      data.eyepass = "Left Eye";
+    }
+    else{
+      data.eyepass = "Right Eye";
+    }
 
     Navigator.push(
         context,
