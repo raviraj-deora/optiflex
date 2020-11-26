@@ -1293,8 +1293,12 @@ class MyCustomFormState extends State<MyCustomForm> {
                                   ],
                                 ),
                                 TextFormField(
-                                  // controller: vertaxController,
-                                  initialValue: '12',
+                                  controller: vertaxController,
+                                  validator: (value){
+                                    print("value = $value");
+                                    return ValidationUtils.validateDoubleField(0.25, 0.70,value, "back vertex");
+                                  },
+                                  //initialValue: '12',
                                   decoration: InputDecoration(
                                       hintText: '0.25mm to 0.70mm',
                                       //labelText: 'Back Vertex Distance(in mm)'
@@ -1396,6 +1400,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                                   child: RaisedButton(
                                     color: AppColors.themeColor,
                                     onPressed: () {
+                                      _allValuePrint();
                                       // Validate returns true if the form is valid, or false
                                       // otherwise.
                                       if (_formKey.currentState.validate()) {
@@ -1433,6 +1438,25 @@ class MyCustomFormState extends State<MyCustomForm> {
         ),
       ),
     );
+  }
+  _allValuePrint(){
+    print("name : ${nameController.text}");
+    print("birth date : $_date");
+    print("patientid : ${patientidController.text}");
+    print("doctorname : ${doctornameController.text}");
+    print("date : $_date2");
+    print("isLeftSelect : $isLeftSelect");
+    print("k1 : ${k1Controller.text}");
+    print("k1axis : ${k1axisController.text}");
+    print("k2 : ${k2Controller.text}");
+    print("k2axis : ${k2axisController.text}");
+    print("pre operative sphere : ${preopsphController.text}");
+    print("pre operative cylinder : ${preopcylController.text}");
+    print("axis of preoperative cylinder : ${preopcylaxisController.text}");
+    print("corneal thickness : ${corthkController.text}");
+    print("back vertex : ${vertaxController.text}");
+    print("white to white distance : ${wtwmanualController.text}");
+    print("Anterior chamber depth : ${acdController.text}");
   }
 
   Widget _oldRadioWidget(){

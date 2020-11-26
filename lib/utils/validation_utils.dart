@@ -21,11 +21,11 @@ class ValidationUtils {
 
   static String validateField(int val1,int val2,String value,String message) {
     print("validateField...value");
-    int val;
+    double val;
     if(value.length>0){
-      val = int.parse(value);
+      val = double.parse(value);
       print("val...$val");
-      if (val<(val1) && val>(val2))
+      if (val<=(val1) && val>=(val2))
         return null;
       else
         return "Enter Valid "+message;
@@ -36,11 +36,11 @@ class ValidationUtils {
   }
   static String validateCylinder(String value,String message) {
     print("validateCylinder...value");
-    int val;
+    double val;
     if(value.length>0){
-      val = int.parse(value);
+      val = double.parse(value);
       print("val...$val");
-      if (val>(-10) && val<(10))
+      if (val>=(-10) && val<=(10))
         return null;
       else
         return "Enter Valid "+message;
@@ -51,10 +51,10 @@ class ValidationUtils {
   }
   static String validateDigree(String value,String message) {
     print("validateDigree...");
-    int val;
+    double val;
     if(value.length>0){
-      val = int.parse(value);
-      if (val>0 && val<180)
+      val = double.parse(value);
+      if (val>=0 && val<=180)
         return null;
       else
         return "Enter Valid "+message;
@@ -66,10 +66,10 @@ class ValidationUtils {
 
   static String validatePosField(int val1,int val2,String value,String message) {
     print("validatePosField...$value");
-    int val;
+    double val;
     if(value.length>0){
-      val = int.parse(value);
-      if (val>35 && val<60)
+      val = double.parse(value);
+      if (val>=35 && val<=60)
         {
           return null;
         }
@@ -87,7 +87,7 @@ class ValidationUtils {
     double val;
     if(value.length>0){
       val = double.parse(value);
-      if (val>val1 && val<val2)
+      if (val>=val1 && val<=val2)
       {
         return null;
       }

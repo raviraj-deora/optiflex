@@ -42,6 +42,7 @@ class CalculationScreenState extends State<CalculationScreen> {
     resetList();
   }
   resetList(){
+    print("data.valueofresidualcylinderpass = ${data.valueofresidualcylinderpass}");
     expectedCylinder.clear();
     expectedCylinder.add(data.valueofresidualcylinderpass);
     expectedCylinder.add(data.valueofresidualcylinderpass-(0.4*1));
