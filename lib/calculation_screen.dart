@@ -25,10 +25,12 @@ class CalculationScreenState extends State<CalculationScreen> {
   String radioItem = '';
   bool isPhacikLens = false;
   int expectedCylinderIndex = 0;
+  int tempExpectedCylinderIndex = 0;
 
   List<PowerOfLens> powerOfLensList = [];
   List<ExpectedSpherical> expectedSphericalList = [];
   double cylinderValue;
+  double tempCylinderValue;
   List<double> expectedCylinder = [];
   List<PhakicToricLense> phakicToricLenseList = [];
 
@@ -631,8 +633,16 @@ class CalculationScreenState extends State<CalculationScreen> {
                                 isPhacikLens = !isPhacikLens;
                               });
                               if(isPhacikLens){
+                                tempCylinderValue = cylinderValue;
+                                tempExpectedCylinderIndex = expectedCylinderIndex;
                                 cylinderValue=0;
                                 resetList();
+                              }
+                              else{
+                                cylinderValue = tempCylinderValue;
+                                expectedCylinderIndex = tempExpectedCylinderIndex;
+                                resetList();
+                                phakicToricLenseList[expectedCylinderIndex].isSelected = true;
                               }
                             },
                           ),
@@ -1608,17 +1618,17 @@ class CalculationScreenState extends State<CalculationScreen> {
                       },
                     ),
                     SizedBox(width: 10,),
-                    Text(powerOfLens.sphere1.abs().toString()),
+                    Text(powerOfLens.sphere1.abs().toStringAsFixed(2)),
                     SizedBox(width: 110,),
-                    Text(powerOfLens.cylinder1.abs().toString()),
+                    Text(powerOfLens.cylinder1.abs().toStringAsFixed(1)),
                     SizedBox(width: 80,),
-                    Text(powerOfLens.sphere2.abs().toString()),
+                    Text(powerOfLens.sphere2.abs().toStringAsFixed(2)),
                     SizedBox(width: 45,),
-                    Text(powerOfLens.cylinder2.abs().toString()),
+                    Text(powerOfLens.cylinder2.abs().toStringAsFixed(2)),
                     SizedBox(width: 65,),
-                    Text(powerOfLens.spherical.abs().toString()),
+                    Text(powerOfLens.spherical.abs().toStringAsFixed(2)),
                     SizedBox(width: 50,),
-                    Text(powerOfLens.axis.toString()),
+                    Text(powerOfLens.axis.toStringAsFixed(0)),
                   ],
                 ),
               ),

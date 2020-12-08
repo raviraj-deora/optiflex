@@ -51,16 +51,22 @@ class ValidationUtils {
   }
   static String validateDigree(String value,String message) {
     print("validateDigree...");
-    double val;
-    if(value.length>0){
-      val = double.parse(value);
-      if (val>=0 && val<=180)
-        return null;
-      else
-        return "Enter Valid "+message;
+
+    if(!value.contains(".")){
+      int val;
+      if(value.length>0){
+        val = int.parse(value);
+        if (val>=0 && val<=180)
+          return null;
+        else
+          return "Enter Valid "+message;
+      }
+      else{
+        return message+" must require";
+      }
     }
     else{
-      return message+" must require";
+      return "Enter only decimal value";
     }
   }
 
