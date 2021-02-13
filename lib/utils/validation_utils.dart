@@ -1,10 +1,11 @@
 class ValidationUtils {
-  static String validateEmpty(String value,String filed) {
+  static String validateEmpty(String value, String filed) {
     if (value.trim().length == 0)
-      return 'must require '+filed;
+      return 'must require ' + filed;
     else
       return null;
   }
+
   static String validateClassName(String value) {
     if (value.trim().length == 0)
       return 'Enter valid class name';
@@ -19,91 +20,85 @@ class ValidationUtils {
       return null;
   }
 
-  static String validateField(int val1,int val2,String value,String message) {
+  static String validateField(
+      int val1, int val2, String value, String message) {
     print("validateField...value");
     double val;
-    if(value.length>0){
+    if (value.length > 0) {
       val = double.parse(value);
       print("val...$val");
-      if (val<=(val1) && val>=(val2))
+      if (val <= (val1) && val >= (val2))
         return null;
       else
-        return "Enter Valid "+message;
-    }
-    else{
-      return message+" must require";
+        return "Enter Valid " + message;
+    } else {
+      return message + " must require";
     }
   }
-  static String validateCylinder(String value,String message) {
+
+  static String validateCylinder(String value, String message) {
     print("validateCylinder...value");
     double val;
-    if(value.length>0){
+    if (value.length > 0) {
       val = double.parse(value);
       print("val...$val");
-      if (val>=(-10) && val<=(10))
+      if (val >= (-10) && val <= (10))
         return null;
       else
-        return "Enter Valid "+message;
-    }
-    else{
-      return message+" must require";
+        return "Enter Valid " + message;
+    } else {
+      return message + " must require";
     }
   }
-  static String validateDigree(String value,String message) {
+
+  static String validateDigree(String value, String message) {
     print("validateDigree...");
 
-    if(!value.contains(".")){
+    if (!value.contains(".")) {
       int val;
-      if(value.length>0){
+      if (value.length > 0) {
         val = int.parse(value);
-        if (val>=0 && val<=180)
+        if (val >= 0 && val <= 180)
           return null;
         else
-          return "Enter Valid "+message;
+          return message + " from 0 to 180 is allowed";
+      } else {
+        return message + " must require";
       }
-      else{
-        return message+" must require";
-      }
-    }
-    else{
+    } else {
       return "Enter only decimal value";
     }
   }
 
-  static String validatePosField(int val1,int val2,String value,String message) {
+  static String validatePosField(
+      int val1, int val2, String value, String message) {
     print("validatePosField...$value");
     double val;
-    if(value.length>0){
+    if (value.length > 0) {
       val = double.parse(value);
-      if (val>=35 && val<=60)
-        {
-          return null;
-        }
-      else
-        {
-          return "Enter Valid "+message;
-        }
-    }
-    else{
-      return message+" must require";
+      if (val >= 35 && val <= 60) {
+        return null;
+      } else {
+        return "Enter Valid " + message;
+      }
+    } else {
+      return message + " must require";
     }
   }
-  static String validateDoubleField(double val1,double val2,String value,String message) {
+
+  static String validateDoubleField(
+      double val1, double val2, String value, String message) {
     print("validatePosField...$value");
     double val;
-    if(value.length>0){
+    if (value.length > 0) {
       val = double.parse(value);
-      if (val>=val1 && val<=val2)
-      {
+      if (val >= val1 && val <= val2) {
         return null;
+      } else {
+        return "Enter Valid " + message;
       }
-      else
-      {
-        return "Enter Valid "+message;
-      }
-    }
-    else{
-      return message+" must require";
+    } else {
+      return message + " must require";
     }
   }
 
@@ -113,18 +108,21 @@ class ValidationUtils {
     else
       return null;
   }
+
   static String validateDescription(String value) {
     if (value.trim().length < 1)
       return 'Description must require';
     else
       return null;
   }
+
   static String validateAddress(String value) {
     if (value.trim().length < 5)
       return 'Address must require requires at least 5 characters';
     else
       return null;
   }
+
   static String validatePostCode(String value) {
     if (value.trim().length < 1)
       return 'Post code must require';
@@ -172,29 +170,30 @@ class ValidationUtils {
     else
       return null;
   }
+
   static String validateMobile2(String value) {
     String patttern = r'(^(?:[+0]9)?[0-9]{10,12}$)';
     RegExp regExp = new RegExp(patttern);
     if (value.length == 0) {
       return 'Please enter mobile number';
-    }
-    else if (!regExp.hasMatch(value)) {
+    } else if (!regExp.hasMatch(value)) {
       return 'Please enter valid mobile number';
     }
     return null;
   }
-  static String validateHashTag(String value){
+
+  static String validateHashTag(String value) {
     String patttern = r"\B#+([\w]+)\b";
     RegExp regExp = new RegExp(patttern);
 
     if (value.length == 0) {
       return 'Please enter HashTag';
-    }
-    else if (!regExp.hasMatch(value)) {
+    } else if (!regExp.hasMatch(value)) {
       return 'Please enter valid HashTag';
     }
     return null;
   }
+
   static String validateMobileOrEmail(String value) {
     String patttern = r'(^(?:[+0]9)?[0-9]{10,12}$)';
     RegExp regExp = new RegExp(patttern);
@@ -205,12 +204,12 @@ class ValidationUtils {
 
     if (value.length == 0) {
       return 'Please enter mobile number or Email';
-    }
-    else if (!regExp.hasMatch(value) && !regex1.hasMatch(value)) {
+    } else if (!regExp.hasMatch(value) && !regex1.hasMatch(value)) {
       return 'Please enter valid mobile number or Email';
     }
     return null;
   }
+
   static String validateFax(String value) {
     if (value.length < 10)
       return 'Enter valid fax no';
@@ -253,7 +252,7 @@ class ValidationUtils {
   }
 
   static String validateUsername(String value) {
-    if (value.length < 2 )
+    if (value.length < 2)
       return 'Name must be greater then 2';
     else
       return null;
@@ -279,6 +278,7 @@ class ValidationUtils {
     else
       return null;
   }
+
   static String timeAgo(DateTime d) {
     Duration diff = DateTime.now().difference(d);
     if (diff.inDays > 365)
@@ -295,22 +295,21 @@ class ValidationUtils {
       return "${diff.inMinutes} ${diff.inMinutes == 1 ? "min" : "mins"} ago";
     return "just now";
   }
+
   static String expiresIn(DateTime d) {
     Duration diff = DateTime.now().difference(d);
-    diff *=-1;
+    diff *= -1;
 
     if (diff.inDays > 365)
       return "Expires in ${(diff.inDays / 365).floor()} ${(diff.inDays / 365).floor() == 1 ? "year" : "years"}";
-    if (diff.inDays > 30)
-      {
-        return "Expires in ${(diff.inDays / 30).floor()} ${(diff.inDays / 30).floor() == 1 ? "month" : "months"}";
-      }
-    if (diff.inDays > 7)
-      {
-        int mod = diff.inDays % 7;
-        String extraDays = mod!=0?mod.toString():"";
-        return "Expires in ${(diff.inDays / 7).floor()} ${(diff.inDays / 7).floor() == 1 ? "week"+" $extraDays days": "weeks"}";
-      }
+    if (diff.inDays > 30) {
+      return "Expires in ${(diff.inDays / 30).floor()} ${(diff.inDays / 30).floor() == 1 ? "month" : "months"}";
+    }
+    if (diff.inDays > 7) {
+      int mod = diff.inDays % 7;
+      String extraDays = mod != 0 ? mod.toString() : "";
+      return "Expires in ${(diff.inDays / 7).floor()} ${(diff.inDays / 7).floor() == 1 ? "week" + " $extraDays days" : "weeks"}";
+    }
     if (diff.inDays > 0)
       return "Expires in ${diff.inDays} ${diff.inDays == 1 ? "day" : "days"}";
     if (diff.inHours > 0)

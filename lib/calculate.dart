@@ -11,6 +11,8 @@ import 'package:optiflexcalculator/utils/validation_utils.dart';
 import 'calculation_screen.dart';
 import 'main.dart';
 import 'model/data_model.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
 //import 'package:horizontal_data_table/horizontal_data_table.dart';
 //import 'package:http/http.dart' as http;
 
@@ -31,8 +33,6 @@ class Calculate extends StatelessWidget {
   }
 }
 
-
-
 // Create a Form widget.
 class MyCustomForm extends StatefulWidget {
   @override
@@ -50,9 +50,14 @@ class MyCustomFormState extends State<MyCustomForm> {
   // Note: This is a GlobalKey<FormState>,
   // not a GlobalKey<MyCustomFormState>.
   DateTime selectedDate = DateTime.now();
+  static final now = new DateTime.now();
+  String formatter = DateFormat('dd/MM/yyyy').format(now); // 28/03/2020
+  FocusNode myFocusNode, myFocusNode2;
+
   TextEditingController _date = new TextEditingController();
   TextEditingController _date2 = new TextEditingController();
   final nameController = TextEditingController();
+  //nameController.text = 'your initial text';
   final patientidController = TextEditingController();
   final doctornameController = TextEditingController();
   final doctorIdController = TextEditingController();
@@ -72,7 +77,8 @@ class MyCustomFormState extends State<MyCustomForm> {
   String radioItem = '';
   bool isLeftSelect = true;
 
-  String dateMessage = "Age of this patient is outside our recommended age group.Click Continue to Proceed.";
+  String dateMessage =
+      "Age of this patient is outside our recommended age group.Click Continue to Proceed.";
 
   int popCount = 0;
   Future<Null> _selectDate(BuildContext context) async {
@@ -82,53 +88,59 @@ class MyCustomFormState extends State<MyCustomForm> {
         firstDate: DateTime(1901, 1),
         lastDate: DateTime(2100));
 
-    if (picked != null)
-      {
-        print("submit....");
-        setState(() {
-          selectedDate = picked;
-          //print(formatDate(selectedDate, [dd, '/', mm, '/', yyyy]));
-          _date.value = TextEditingValue(text: formatDate(selectedDate, [dd, '/', mm, '/', yyyy]));
-        });
-      }
+    if (picked != null) {
+      print("submit....");
+      setState(() {
+        selectedDate = picked;
+        //print(formatDate(selectedDate, [dd, '/', mm, '/', yyyy]));
+        _date.value = TextEditingValue(
+            text: formatDate(selectedDate, [dd, '/', mm, '/', yyyy]));
+      });
+    }
 
     int yearDiff = DateTime.now().year - selectedDate.year;
     print("yearDiff = $yearDiff");
-    if(yearDiff<21 || yearDiff>45){
+    if (yearDiff < 21 || yearDiff > 45) {
       datePopup();
     }
+    myFocusNode.requestFocus();
   }
-  datePopup(){
+
+  datePopup() {
     return showDialog(
-      barrierDismissible: false,
+        barrierDismissible: false,
         context: context,
         builder: (BuildContext subContext) {
           return AlertDialog(
-            content:Text(dateMessage),
+            content: Text(dateMessage),
             actions: <Widget>[
-              FlatButton(child: Text('CONTINUE'),
+              FlatButton(
+                  child: Text('CONTINUE'),
                   onPressed: () {
                     Navigator.pop(subContext);
                   }),
-
             ],
           );
         });
   }
-  submitPOpup1(){
+
+  submitPOpup1() {
     popCount++;
     return showDialog(
         barrierDismissible: false,
         context: context,
         builder: (BuildContext subContext) {
           return AlertDialog(
-            content:Text("The corneal cylinder and refractive cylinder do not match. Click Continue to Confirm or Cancel to change values."),
+            content: Text(
+                "The corneal cylinder and refractive cylinder do not match. Click Continue to Confirm or Cancel to change values."),
             actions: <Widget>[
-              FlatButton(child: Text('CONTINUE'),
+              FlatButton(
+                  child: Text('CONTINUE'),
                   onPressed: () {
                     popHide(subContext, false);
                   }),
-              FlatButton(child: Text('CANCEL'),
+              FlatButton(
+                  child: Text('CANCEL'),
                   onPressed: () {
                     popHide(subContext, true);
                   }),
@@ -136,63 +148,71 @@ class MyCustomFormState extends State<MyCustomForm> {
           );
         });
   }
-  k1k2Popup2(){
+
+  k1k2Popup2() {
     popCount++;
     return showDialog(
         barrierDismissible: false,
         context: context,
         builder: (BuildContext subContext) {
           return AlertDialog(
-            content:Text("The axis of K1 and k2 are not 90 degrees apart. Click Continue to Confirm or Cancel to change values."),
+            content: Text(
+                "The axis of K1 and k2 are not 90 degrees apart. Click Continue to Confirm or Cancel to change values."),
             actions: <Widget>[
-              FlatButton(child: Text('CONTINUE'),
+              FlatButton(
+                  child: Text('CONTINUE'),
                   onPressed: () {
-                    popHide(subContext,false);
+                    popHide(subContext, false);
                   }),
-              FlatButton(child: Text('CANCEL'),
+              FlatButton(
+                  child: Text('CANCEL'),
                   onPressed: () {
-                    popHide(subContext,true);
+                    popHide(subContext, true);
                   }),
             ],
           );
         });
   }
-  AnteriorChamberPopup(){
+
+  AnteriorChamberPopup() {
     popCount++;
     return showDialog(
         barrierDismissible: false,
         context: context,
         builder: (BuildContext subContext) {
           return AlertDialog(
-            content:Text("The entered value for Anterior Chamber Depth is >3.5mm."),
+            content: Text(
+                "The entered value for Anterior Chamber Depth ≥ 3.5mm. Click Continue to Confirm or Cancel to change value."),
             actions: <Widget>[
-              FlatButton(child: Text('CONTINUE'),
+              FlatButton(
+                  child: Text('CONTINUE'),
                   onPressed: () {
-                    popHide(subContext,false);
+                    popHide(subContext, false);
                   }),
-              FlatButton(child: Text('CANCEL'),
+              FlatButton(
+                  child: Text('CANCEL'),
                   onPressed: () {
-                    popHide(subContext,true);
+                    popHide(subContext, true);
                   }),
             ],
           );
         });
   }
-  popHide(BuildContext subContext,bool isCancel){
+
+  popHide(BuildContext subContext, bool isCancel) {
     Navigator.pop(subContext);
     popCount--;
     print("popCount = $popCount");
-    if(popCount==0){
-      if(!isCancel){
+    if (popCount == 0) {
+      if (!isCancel) {
         calculateData();
       }
 
-      Scaffold.of(context).showSnackBar(
-          SnackBar(
-              content:
-              Text('Processing Data')));
+      Scaffold.of(context)
+          .showSnackBar(SnackBar(content: Text('Processing Data')));
     }
   }
+
   Future<Null> _selectDate2(BuildContext context) async {
     final DateTime picked = await showDatePicker(
         context: context,
@@ -202,8 +222,10 @@ class MyCustomFormState extends State<MyCustomForm> {
     if (picked != null && picked != selectedDate)
       setState(() {
         selectedDate = picked;
-        _date2.value = TextEditingValue(text: formatDate(selectedDate, [dd, '/', mm, '/', yyyy]));
+        _date2.value = TextEditingValue(
+            text: formatDate(selectedDate, [dd, '/', mm, '/', yyyy]));
       });
+    myFocusNode2.requestFocus();
   }
 
   final _formKey = GlobalKey<FormState>();
@@ -258,6 +280,7 @@ class MyCustomFormState extends State<MyCustomForm> {
         rkref;
 
     double PostOpSphere = 0.01;
+
     // $rprerx = preopsphfloat
     // $rdpostrx = preopcyfloat
     // $axisofrdpostrx = preopcylaxisfloat
@@ -599,6 +622,7 @@ class MyCustomFormState extends State<MyCustomForm> {
       5.0
     ];
     double valueofcylinder = higherlenspower - lowerlenspower;
+    print("valueofcylinder" + valueofcylinder.toStringAsFixed(5));
     double selectedvalueofcylinder =
         getClosest(valueofcylinder, selectedCylinderPowerArr);
 
@@ -643,6 +667,7 @@ class MyCustomFormState extends State<MyCustomForm> {
     valueofresidualcylinder =
         double.parse((valueofresidualcylinder).toStringAsFixed(2));
     if (selectedvalueofcylinder != 0) {
+      // print("Testrd: 1");
       middlevalueofsphericalequivalent =
           middlevalueofresidualsphere + (valueofresidualcylinder / 2);
       firstvalueofsphericalequivalent =
@@ -655,6 +680,7 @@ class MyCustomFormState extends State<MyCustomForm> {
           fifthvalueofresidualsphere + (valueofresidualcylinder / 2);
     } else /* if phakic lens ($selectedvalueofcylinder==0)*/
     {
+      //  print("Testrd: 2");
       if (selectedvalueofcylinder < valueofcylinder) {
         middlevalueofsphericalequivalent =
             middlevalueofresidualsphere + (valueofresidualcylinder / 2);
@@ -766,34 +792,31 @@ class MyCustomFormState extends State<MyCustomForm> {
         fourthvalueofspgerepass: fourthvalueofspehere,
         fifthvalueofspherepass: fifthvalueofspehere,
         selectedvalueofcylinderpass: selectedvalueofcylinder,
+        valueofcylinderpass: valueofcylinder,
         firstvalueofresidualspherepass: firstvalueofresidualsphere,
         secondvalueofresidualspherepass: secondvalueofresidualsphere,
         middlevalueofresidualspherepass: middlevalueofresidualsphere,
         fourthvalueofresidualspherepass: fourthvalueofresidualsphere,
         fifthvalueofresidualspherepass: fifthvalueofresidualsphere,
         valueofresidualcylinderpass: valueofresidualcylinder,
-        firstvalueofsphericalequivalentpass:
-            firstvalueofsphericalequivalent,
-        secondvalueofsphericalequivalentpass:
-            secondvalueofsphericalequivalent,
-        middlevalueofsphericalequivalentpass:
-            middlevalueofsphericalequivalent,
-        fourthvalueofsphericalequivalentpass:
-            fourthvalueofsphericalequivalent,
-        fifthvalueofsphericalequivalentpass:
-            fifthvalueofsphericalequivalent,
+        firstvalueofsphericalequivalentpass: firstvalueofsphericalequivalent,
+        secondvalueofsphericalequivalentpass: secondvalueofsphericalequivalent,
+        middlevalueofsphericalequivalentpass: middlevalueofsphericalequivalent,
+        fourthvalueofsphericalequivalentpass: fourthvalueofsphericalequivalent,
+        fifthvalueofsphericalequivalentpass: fifthvalueofsphericalequivalent,
         axisofplacementpass: axisofplacement);
-    if(!isLeftSelect){
+    if (!isLeftSelect) {
       data.eyepass = "Left Eye";
-    }
-    else{
+    } else {
       data.eyepass = "Right Eye";
     }
 
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => CalculationScreen(data,)));
+            builder: (context) => CalculationScreen(
+                  data,
+                )));
     //print(k2axisfloat);
   }
 
@@ -807,729 +830,1008 @@ class MyCustomFormState extends State<MyCustomForm> {
     setState(() {
       doctornameController.text = user.uname;
       vertaxController.text = "12";
+      _date2.text = formatter;
+      myFocusNode = FocusNode();
+      myFocusNode2 = FocusNode();
     });
   }
+
   @override
   Widget build(BuildContext context) {
     // Build a Form widget using the _formKey created above.
     return SingleChildScrollView(
       child: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 10, // 20%
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: <Widget>[
-                        Common.headingWidget("Patient Details"),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 2, // 20%
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 10.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    DropdownButtonFormField(
-                                      value: 'Mr',
-                                      items: ['Mr', 'Miss', 'Mrs']
-                                          .map((label) => DropdownMenuItem(
-                                        child: Text(label.toString()),
-                                        value: label,
-                                      ))
-                                          .toList(),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          //_ratingController = value;
-                                        });
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 8, // 80%
-                              child: Padding(
-                                padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    TextFormField(
-                                      controller: nameController,
-                                      validator: ValidationUtils.validateName,
-                                      decoration: InputDecoration(
-                                          hintText: 'Please enter your name',
-                                          labelText: 'Name'),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 100, // 80%
-                              child: Padding(
-                                padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    SizedBox(height: 10,),
-                                    Text("Date Of Birth",style: headingStyle,),
-                                    GestureDetector(
-                                      onTap: () => _selectDate(context),
-                                      child: AbsorbPointer(
-                                        child: TextFormField(
-                                          controller: _date,
-                                          validator: (value){
-                                            return ValidationUtils.validateEmpty(value, "Date Of Birth");
-                                          },
-                                          keyboardType: TextInputType.datetime,
-                                          decoration: InputDecoration(
-                                              hintText: 'DD/MM/YYYY',
-                                              labelText: 'DD/MM/YYYY'),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 10, // 80%
-                              child: Padding(
-                                padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    SizedBox(height: 10,),
-                                    Text("Patient\'s ID",style: headingStyle,),
-                                    TextFormField(
-                                      controller: patientidController,
-                                      validator: (value){
-                                        return ValidationUtils.validateEmpty(value, "Patient\'s ID");
-                                      },
-                                      decoration: InputDecoration(
-                                          hintText: 'Please enter patient\'s id',
-                                          labelText: 'Patient Case No.'),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 10, // 80%
-                              child: Padding(
-                                padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    SizedBox(height: 10,),
-                                    Text("Docotor\'s Name",style: headingStyle,),
-                                    TextFormField(
-                                      controller: doctornameController,
-                                      validator: (value){
-                                        return ValidationUtils.validateEmpty(value, "Docotor\'s Name");
-                                      },
-                                      decoration: InputDecoration(
-                                          hintText: 'Please enter docotor\'s name',
-                                          labelText: 'docotor\'s name'),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 10, // 80%
-                              child: Padding(
-                                padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    SizedBox(height: 10,),
-                                    Text("Docotor\'s Id",style: headingStyle,),
-                                    TextFormField(
-                                      controller: doctorIdController,
-                                      validator: (value){
-                                        return ValidationUtils.validateEmpty(value, "Docotor\'s Id");
-                                      },
-                                      decoration: InputDecoration(
-                                          hintText: 'Please enter docotor\'s Id',
-                                          labelText: 'docotor\'s Id'),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 10, // 80%
-                              child: Padding(
-                                padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    SizedBox(height: 10,),
-                                    Text("Date",style: headingStyle,),
-                                    GestureDetector(
-                                      onTap: () => _selectDate2(context),
-                                      child: AbsorbPointer(
-                                        child: TextFormField(
-                                          controller: _date2,
-                                          validator: (value){
-                                            return ValidationUtils.validateEmpty(value, "Date");
-                                          },
-                                          keyboardType: TextInputType.datetime,
-                                          decoration: InputDecoration(
-                                              hintText: 'Date', labelText: 'DD/MM/YYYY'),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(right: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    flex: 10, // 20%
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: <Widget>[
+                          Common.headingWidget("Patient Details"),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
-                              IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    isLeftSelect = !isLeftSelect;
-                                  });
-                                },
-                                icon: Icon(isLeftSelect?Icons.brightness_1:Icons.panorama_fish_eye,color: AppColors.themeColor,),
+                              Expanded(
+                                flex: 2, // 20%
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 10.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      DropdownButtonFormField(
+                                        value: 'Mr',
+                                        items: ['Mr', 'Miss', 'Mrs']
+                                            .map((label) => DropdownMenuItem(
+                                                  child: Text(label.toString()),
+                                                  value: label,
+                                                ))
+                                            .toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            //_ratingController = value;
+                                          });
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                              Text("Right eye-OD"),
-                              Expanded(child: Container(),),
-                              IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    isLeftSelect = !isLeftSelect;
-                                  });
-                                },
-                                icon: Icon(!isLeftSelect?Icons.brightness_1:Icons.panorama_fish_eye,color: AppColors.themeColor,),
+                              Expanded(
+                                flex: 8, // 80%
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      TextFormField(
+                                        controller: nameController,
+                                        validator: ValidationUtils.validateName,
+                                        decoration: InputDecoration(
+                                            hintText: 'Please enter your name',
+                                            labelText: 'Name'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                              Text("Left eye-OS"),
-
                             ],
                           ),
-                        ),
-                        Common.headingWidget("pre-operative data"),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 10, // 80%
-                              child: Padding(
-                                padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    SizedBox(height: 10,),
-                                    Row(
-                                      children: [
-                                        Text("K1",style: headingStyle,),
-                                        Text("*",style:TextStyle(color: Colors.red),),
-                                      ],
-                                    ),
-                                    TextFormField(
-                                      controller: k1Controller,
-                                      keyboardType: TextInputType.numberWithOptions(decimal: true,signed: false),
-                                      validator: (value){
-                                        print("value = $value");
-                                        return ValidationUtils.validatePosField(35, 60,value, "k1");
-                                      },
-                                      decoration: InputDecoration(
-                                          hintText: 'Please enter value of K1',
-                                          labelText: '(35.00 D to 60.00 D)'),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 10, // 80%
-                              child: Padding(
-                                padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    SizedBox(height: 10,),
-                                    Row(
-                                      children: [
-                                        Text("Axis of K1",style: headingStyle,),
-                                        Text("*",style:TextStyle(color: Colors.red),),
-                                      ],
-                                    ),
-                                    TextFormField(
-                                      controller: k1axisController,
-                                      keyboardType: TextInputType.numberWithOptions(decimal: true,signed: false),
-                                      validator: (value){
-                                        print("value= $value");
-                                        return ValidationUtils.validateDigree(k1axisController.text, "Axis of k1");
-                                      },
-                                      decoration: InputDecoration(
-                                          hintText: '0° to 180°',
-                                          labelText: '(0° to 180°)'),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 10, // 80%
-                              child: Padding(
-                                padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    SizedBox(height: 10,),
-                                    Row(
-                                      children: [
-                                        Text("K2",style: headingStyle,),
-                                        Text("*",style:TextStyle(color: Colors.red),),
-                                      ],
-                                    ),
-                                    TextFormField(
-                                      controller: k2Controller,
-                                      keyboardType: TextInputType.numberWithOptions(decimal: true,signed: false),
-                                      validator: (value){
-                                        print("value = $value");
-                                        return ValidationUtils.validatePosField(35, 60,value, "k2");
-                                      },
-                                      decoration: InputDecoration(
-                                          hintText: 'Please enter value of K2',
-                                          labelText: '(35.00 D to 60.00 D)'),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 10, // 80%
-                              child: Padding(
-                                padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    SizedBox(height: 10,),
-                                    Row(
-                                      children: [
-                                        Text("Axis of K2",style: headingStyle,),
-                                        Text("*",style:TextStyle(color: Colors.red),),
-                                      ],
-                                    ),
-                                    TextFormField(
-                                      controller: k2axisController,
-                                      keyboardType: TextInputType.numberWithOptions(decimal: true,signed: false),
-                                      validator: (value){
-                                        print("value = $value");
-                                        return ValidationUtils.validateDigree(value, "Axis of k2");
-                                      },
-                                      decoration: InputDecoration(
-                                          hintText: '0° to 180°',
-                                          labelText: '(0° to 180)'),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 10, // 80%
-                              child: Padding(
-                                padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    SizedBox(height: 10,),
-                                    Row(
-                                      children: [
-                                        Text("Pre-Operative Sphere",style: headingStyle,),
-                                        Text("*",style:TextStyle(color: Colors.red),),
-                                      ],
-                                    ),
-                                    TextFormField(
-                                      controller: preopsphController,
-                                      keyboardType: TextInputType.numberWithOptions(decimal: true,signed: true),
-                                      validator: (value){
-                                        print("value = $value");
-                                        return ValidationUtils.validateField(-1,-25,value, "Pre-Operative Sphere");
-                                      },
-                                      decoration: InputDecoration(
-                                          hintText: '-1.0D to -25.0D',
-                                          labelText: '-1.0D to -25.0D'),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 10, // 80%
-                              child: Padding(
-                                padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    SizedBox(height: 10,),
-                                    Row(
-                                      children: [
-                                        Text("Pre-Operative Cylinder",style: headingStyle,),
-                                        Text("*",style:TextStyle(color: Colors.red),),
-                                      ],
-                                    ),
-                                    TextFormField(
-                                      controller: preopcylController,
-                                      keyboardType: TextInputType.numberWithOptions(decimal: true,signed: true),
-                                      validator: (value){
-                                        return ValidationUtils.validateCylinder(value, "Pre-Perative Cylinder");
-                                      },
-                                      decoration: InputDecoration(
-                                          hintText: '-10.0D to +10.0D',
-                                          labelText: '-10.0D to +10.0D'),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 10, // 80%
-                              child: Padding(
-                                padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    SizedBox(height: 10,),
-                                    Row(
-                                      children: [
-                                        Text("Axis Of Pre-Operative Cylinder",style: headingStyle,),
-                                        Text("*",style:TextStyle(color: Colors.red),),
-                                      ],
-                                    ),
-                                    TextFormField(
-                                      controller: preopcylaxisController,
-                                      keyboardType: TextInputType.numberWithOptions(decimal: true,signed: false),
-                                      validator: (value){
-                                        print("value = $value");
-                                        return ValidationUtils.validateDigree(value, "Axis Of Pre-Operative Cylinder");
-                                      },
-                                      decoration: InputDecoration(
-                                          hintText: '0° to 180°',
-                                          labelText:
-                                          '(0° to 180)'),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 10, // 80%
-                              child: Padding(
-                                padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    SizedBox(height: 10,),
-                                    Row(
-                                      children: [
-                                        Text("Corneal Thickness",style: headingStyle,),
-                                        Text("*",style:TextStyle(color: Colors.red),),
-                                      ],
-                                    ),
-                                    TextFormField(
-                                      controller: corthkController,
-                                      keyboardType: TextInputType.numberWithOptions(decimal: true,signed: false),
-                                      validator: (value){
-                                        print("value = $value");
-                                        return ValidationUtils.validateDoubleField(0.25,3.00,value, "Axis Of Pre-Operative Cylinder");
-                                      },
-                                      decoration: InputDecoration(
-                                          hintText: '0.250mm to 3.000mm',
-                                          labelText: '0.250mm to 3.000mm'),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 10, // 80%
-                              child: Padding(
-                                padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    SizedBox(height: 10,),
-                                    Row(
-                                      children: [
-                                        Text("Back Vertex Distance(in mm)",style: headingStyle,),
-                                        Text("*",style:TextStyle(color: Colors.red),),
-                                      ],
-                                    ),
-                                    TextFormField(
-                                      controller: vertaxController,
-                                      enabled: false,
-                                      //initialValue: '12',
-                                      decoration: InputDecoration(
-                                        hintText: '0.25mm to 0.70mm',
-                                        //labelText: 'Back Vertex Distance(in mm)'
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Expanded(
-                              flex: 10, // 80%
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  SizedBox(height: 10,),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Expanded(
+                                flex: 100, // 80%
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: <Widget>[
-                                      Expanded(
-                                        flex: 10, // 80%
-                                        child: Padding(
-                                          padding:
-                                          const EdgeInsets.only(left: 8.0, right: 8.0),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              SizedBox(height: 10,),
-                                              Row(
-                                                children: [
-                                                  Text("Anterior Chamber Depth",style: headingStyle,),
-                                                  Text("*",style:TextStyle(color: Colors.red),),
-                                                  Text("(From Endothelium)",style: TextStyle(fontSize: 12,color: AppColors.themeGreyColor),),
-                                                ],
-                                              ),
-                                              TextFormField(
-                                                controller: acdController,
-                                                keyboardType: TextInputType.numberWithOptions(decimal: true,signed: false),
-                                                validator: (value){
-                                                  print("value = $value");
-                                                  return ValidationUtils.validateDoubleField(2.80,4.5,value, "Anterior Chamber Depth");
-                                                },
-                                                decoration: InputDecoration(
-                                                    hintText: '2.80mm to 4.50mm',
-                                                    labelText: '2.80mm to 4.50mm'),
-                                              ),
-                                            ],
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        "Date Of Birth",
+                                        style: headingStyle,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () => _selectDate(context),
+                                        child: AbsorbPointer(
+                                          child: TextFormField(
+                                            controller: _date,
+                                            focusNode: myFocusNode,
+                                            validator: (value) {
+                                              return ValidationUtils
+                                                  .validateEmpty(
+                                                      value, "Date Of Birth");
+                                            },
+                                            keyboardType:
+                                                TextInputType.datetime,
+                                            decoration: InputDecoration(
+                                              hintText: 'DD/MM/YYYY',
+                                              labelText: 'DD/MM/YYYY',
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ],
                                   ),
-
-
-                                ],
+                                ),
                               ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Expanded(
+                                flex: 10, // 80%
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        "Patient\'s ID",
+                                        style: headingStyle,
+                                      ),
+                                      TextFormField(
+                                        controller: patientidController,
+                                        validator: (value) {
+                                          return ValidationUtils.validateEmpty(
+                                              value, "Patient\'s ID");
+                                        },
+                                        decoration: InputDecoration(
+                                            hintText:
+                                                'Please enter patient\'s id',
+                                            labelText: 'Patient Case No.'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Expanded(
+                                flex: 10, // 80%
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        "Docotor\'s Name",
+                                        style: headingStyle,
+                                      ),
+                                      TextFormField(
+                                        controller: doctornameController,
+                                        validator: (value) {
+                                          return ValidationUtils.validateEmpty(
+                                              value, "Docotor\'s Name");
+                                        },
+                                        decoration: InputDecoration(
+                                            hintText:
+                                                'Please enter docotor\'s name',
+                                            labelText: 'docotor\'s name'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Expanded(
+                                flex: 10, // 80%
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        "Docotor\'s Id",
+                                        style: headingStyle,
+                                      ),
+                                      TextFormField(
+                                        controller: doctorIdController,
+                                        validator: (value) {
+                                          return ValidationUtils.validateEmpty(
+                                              value, "Docotor\'s Id");
+                                        },
+                                        decoration: InputDecoration(
+                                            hintText:
+                                                'Please enter docotor\'s Id',
+                                            labelText: 'docotor\'s Id'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Expanded(
+                                flex: 10, // 80%
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        "Date",
+                                        style: headingStyle,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () => _selectDate2(context),
+                                        child: AbsorbPointer(
+                                          child: TextFormField(
+                                            controller: _date2,
+                                            focusNode: myFocusNode2,
+                                            validator: (value) {
+                                              return ValidationUtils
+                                                  .validateEmpty(value, "Date");
+                                            },
+                                            keyboardType:
+                                                TextInputType.datetime,
+                                            decoration: InputDecoration(
+                                                hintText: 'Date',
+                                                labelText: 'DD/MM/YYYY'),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      isLeftSelect = !isLeftSelect;
+                                    });
+                                  },
+                                  icon: Icon(
+                                    isLeftSelect
+                                        ? Icons.brightness_1
+                                        : Icons.panorama_fish_eye,
+                                    color: AppColors.themeColor,
+                                  ),
+                                ),
+                                Text("Right eye-OD"),
+                                Expanded(
+                                  child: Container(),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      isLeftSelect = !isLeftSelect;
+                                    });
+                                  },
+                                  icon: Icon(
+                                    !isLeftSelect
+                                        ? Icons.brightness_1
+                                        : Icons.panorama_fish_eye,
+                                    color: AppColors.themeColor,
+                                  ),
+                                ),
+                                Text("Left eye-OS"),
+                              ],
                             ),
-                          ],
-                        ),
-
-
-                      ],
+                          ),
+                          Common.headingWidget("pre-operative data"),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Expanded(
+                                flex: 10, // 80%
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "K1",
+                                            style: headingStyle,
+                                          ),
+                                          Text(
+                                            "*",
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ],
+                                      ),
+                                      TextFormField(
+                                        controller: k1Controller,
+                                        keyboardType:
+                                            TextInputType.numberWithOptions(
+                                                decimal: true, signed: false),
+                                        validator: (value) {
+                                          print("value = $value");
+                                          return ValidationUtils
+                                              .validatePosField(
+                                                  35, 60, value, "k1");
+                                        },
+                                        decoration: InputDecoration(
+                                            hintText:
+                                                'Please enter value of K1',
+                                            labelText: '(35.00 D to 60.00 D)'),
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.allow(
+                                              RegExp('[0-9.,-]+')),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Expanded(
+                                flex: 10, // 80%
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "Axis of K1",
+                                            style: headingStyle,
+                                          ),
+                                          Text(
+                                            "*",
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ],
+                                      ),
+                                      TextFormField(
+                                        controller: k1axisController,
+                                        keyboardType:
+                                            TextInputType.numberWithOptions(
+                                                decimal: true, signed: false),
+                                        validator: (value) {
+                                          print("value= $value");
+                                          return ValidationUtils.validateDigree(
+                                              k1axisController.text,
+                                              "Axis of k1");
+                                        },
+                                        decoration: InputDecoration(
+                                            hintText: '0° to 180°',
+                                            labelText: '(0° to 180°)'),
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter
+                                              .digitsOnly,
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Expanded(
+                                flex: 10, // 80%
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "K2",
+                                            style: headingStyle,
+                                          ),
+                                          Text(
+                                            "*",
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ],
+                                      ),
+                                      TextFormField(
+                                        controller: k2Controller,
+                                        keyboardType:
+                                            TextInputType.numberWithOptions(
+                                                decimal: true, signed: false),
+                                        validator: (value) {
+                                          print("value = $value");
+                                          return ValidationUtils
+                                              .validatePosField(
+                                                  35, 60, value, "k2");
+                                        },
+                                        decoration: InputDecoration(
+                                            hintText:
+                                                'Please enter value of K2',
+                                            labelText: '(35.00 D to 60.00 D)'),
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.allow(
+                                              RegExp('[0-9.,-]+')),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Expanded(
+                                flex: 10, // 80%
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "Axis of K2",
+                                            style: headingStyle,
+                                          ),
+                                          Text(
+                                            "*",
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ],
+                                      ),
+                                      TextFormField(
+                                        controller: k2axisController,
+                                        keyboardType:
+                                            TextInputType.numberWithOptions(
+                                                decimal: true, signed: false),
+                                        validator: (value) {
+                                          print("value = $value");
+                                          return ValidationUtils.validateDigree(
+                                              value, "Axis of k2");
+                                        },
+                                        decoration: InputDecoration(
+                                            hintText: '0° to 180°',
+                                            labelText: '(0° to 180°)'),
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter
+                                              .digitsOnly,
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Expanded(
+                                flex: 10, // 80%
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "Pre-Operative Sphere",
+                                            style: headingStyle,
+                                          ),
+                                          Text(
+                                            "*",
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ],
+                                      ),
+                                      TextFormField(
+                                        controller: preopsphController,
+                                        keyboardType:
+                                            TextInputType.numberWithOptions(
+                                                decimal: true, signed: true),
+                                        validator: (value) {
+                                          print("value = $value");
+                                          return ValidationUtils.validateField(
+                                              -1,
+                                              -25,
+                                              value,
+                                              "Pre-Operative Sphere");
+                                        },
+                                        decoration: InputDecoration(
+                                            hintText: '-1.0D to -25.0D',
+                                            labelText: '-1.0D to -25.0D'),
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.allow(
+                                              RegExp('[0-9.,-]+')),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Expanded(
+                                flex: 10, // 80%
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "Pre-Operative Cylinder",
+                                            style: headingStyle,
+                                          ),
+                                          Text(
+                                            "*",
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ],
+                                      ),
+                                      TextFormField(
+                                        controller: preopcylController,
+                                        keyboardType:
+                                            TextInputType.numberWithOptions(
+                                                decimal: true, signed: true),
+                                        validator: (value) {
+                                          return ValidationUtils
+                                              .validateCylinder(value,
+                                                  "Pre-Perative Cylinder");
+                                        },
+                                        decoration: InputDecoration(
+                                            hintText: '-10.0D to +10.0D',
+                                            labelText: '-10.0D to +10.0D'),
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.allow(
+                                              RegExp('[0-9.,-]+')),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Expanded(
+                                flex: 10, // 80%
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "Axis Of Pre-Operative Cylinder",
+                                            style: headingStyle,
+                                          ),
+                                          Text(
+                                            "*",
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ],
+                                      ),
+                                      TextFormField(
+                                        controller: preopcylaxisController,
+                                        keyboardType:
+                                            TextInputType.numberWithOptions(
+                                                decimal: true, signed: false),
+                                        validator: (value) {
+                                          print("value = $value");
+                                          return ValidationUtils.validateDigree(
+                                              value,
+                                              "Axis Of Pre-Operative Cylinder");
+                                        },
+                                        decoration: InputDecoration(
+                                            hintText: '0° to 180°',
+                                            labelText: '(0° to 180°)'),
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter
+                                              .digitsOnly,
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Expanded(
+                                flex: 10, // 80%
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "Corneal Thickness",
+                                            style: headingStyle,
+                                          ),
+                                          Text(
+                                            "*",
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ],
+                                      ),
+                                      TextFormField(
+                                        controller: corthkController,
+                                        keyboardType:
+                                            TextInputType.numberWithOptions(
+                                                decimal: true, signed: false),
+                                        validator: (value) {
+                                          print("value = $value");
+                                          return ValidationUtils
+                                              .validateDoubleField(0.25, 0.70,
+                                                  value, "Corneal Thickness");
+                                        },
+                                        decoration: InputDecoration(
+                                            hintText: '0.250mm to 0.700mm',
+                                            labelText: '0.250mm to 0.700mm'),
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.allow(
+                                              RegExp('[0-9.,-]+')),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Expanded(
+                                flex: 10, // 80%
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "Back Vertex Distance(in mm)",
+                                            style: headingStyle,
+                                          ),
+                                          Text(
+                                            "*",
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ],
+                                      ),
+                                      TextFormField(
+                                        controller: vertaxController,
+                                        enabled: false,
+                                        //initialValue: '12',
+                                        decoration: InputDecoration(
+                                            //  hintText: '0.25mm to 0.70mm',
+                                            //labelText: 'Back Vertex Distance(in mm)'
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Expanded(
+                                flex: 10, // 80%
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: <Widget>[
+                                        Expanded(
+                                          flex: 10, // 80%
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 8.0, right: 8.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                SizedBox(
+                                                  height: 10,
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "Anterior Chamber Depth",
+                                                      style: headingStyle,
+                                                    ),
+                                                    Text(
+                                                      "*",
+                                                      style: TextStyle(
+                                                          color: Colors.red),
+                                                    ),
+                                                    Text(
+                                                      "(From Endothelium)",
+                                                      style: TextStyle(
+                                                          fontSize: 12,
+                                                          color: AppColors
+                                                              .themeGreyColor),
+                                                    ),
+                                                  ],
+                                                ),
+                                                TextFormField(
+                                                  controller: acdController,
+                                                  keyboardType: TextInputType
+                                                      .numberWithOptions(
+                                                          decimal: true,
+                                                          signed: false),
+                                                  validator: (value) {
+                                                    print("value = $value");
+                                                    return ValidationUtils
+                                                        .validateDoubleField(
+                                                            2.80,
+                                                            4.5,
+                                                            value,
+                                                            "Anterior Chamber Depth");
+                                                  },
+                                                  decoration: InputDecoration(
+                                                      hintText:
+                                                          '2.80mm to 4.50mm',
+                                                      labelText:
+                                                          '2.80mm to 4.50mm'),
+                                                  inputFormatters: [
+                                                    FilteringTextInputFormatter
+                                                        .allow(RegExp(
+                                                            '[0-9.,-]+')),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            Padding(
-              padding:
-              const EdgeInsets.only(left: 8.0, right: 8.0),
-              child: Column(
-                children: [
-                  SizedBox(height: 10,),
-                  Row(
-                    children: [
-                      Text("White to White Distance",style: headingStyle,),
-                      Text("*",style:TextStyle(color: Colors.red),),
-                    ],
-                  ),
-                  SizedBox(height: 5,),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("MANUAL"),
-                            Form(
-                              key: _formKey1,
-                              child: TextFormField(
-                                controller: wtwmanualController,
-                                keyboardType: TextInputType.numberWithOptions(decimal: true,signed: false),
-                                validator: (value){
-                                  print("value = $value");
-                                  return ValidationUtils.validateDoubleField(10.5,12.6,value, "White to White Distance");
-                                },
-                                decoration: InputDecoration(
-                                    hintText: '',
-                                    labelText: '10.5mm to 12.6mm'),
-                              ),
-                            )
-                          ],
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          "White to White Distance",
+                          style: headingStyle,
                         ),
-                      ),
-                      SizedBox(width: 20,),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("ORBSCAN"),
-                            Form(
-                              key: _formKey2,
-                              child: TextFormField(
-                                controller: wtworbscanController,
-                                keyboardType: TextInputType.numberWithOptions(decimal: true,signed: false),
-                                validator: (value){
-                                  print("value = $value");
-                                  return ValidationUtils.validateDoubleField(10.65,12.75,value, "White to White Distance");
-                                },
-                                decoration: InputDecoration(
-                                    hintText: '',
-                                    labelText: '10.65mm to 12.75mm'),
-                              ),
-                            )
-                          ],
+                        Text(
+                          "*",
+                          style: TextStyle(color: Colors.red),
                         ),
-                      ),
-                    ],
-                  ),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      Expanded(
-                        flex: 10, // 80%
-                        child: Padding(
-                          padding:
-                          const EdgeInsets.only(left: 8.0, right: 8.0),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 16.0),
-                                child: RaisedButton(
-                                  color: AppColors.themeColor,
-                                  onPressed: () {
-                                    _allValuePrint();
-                                    // Validate returns true if the form is valid, or false
-                                    // otherwise.
-                                    if (!_formKey.currentState.validate()) {
+                            children: [
+                              Text("MANUAL"),
+                              Form(
+                                key: _formKey1,
+                                child: TextFormField(
+                                  controller: wtwmanualController,
+                                  keyboardType: TextInputType.numberWithOptions(
+                                      decimal: true, signed: false),
+                                  validator: (value) {
+                                    print("value = $value");
+                                    return ValidationUtils.validateDoubleField(
+                                        10.5,
+                                        12.6,
+                                        value,
+                                        "White to White Distance");
+                                  },
+                                  decoration: InputDecoration(
+                                      hintText: '',
+                                      labelText: '10.5mm to 12.6mm'),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(
+                                        RegExp('[0-9.,-]+')),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          width: 20,
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("ORBSCAN"),
+                              Form(
+                                key: _formKey2,
+                                child: TextFormField(
+                                  controller: wtworbscanController,
+                                  keyboardType: TextInputType.numberWithOptions(
+                                      decimal: true, signed: false),
+                                  validator: (value) {
+                                    print("value = $value");
+                                    return ValidationUtils.validateDoubleField(
+                                        10.65,
+                                        12.75,
+                                        value,
+                                        "White to White Distance");
+                                  },
+                                  decoration: InputDecoration(
+                                      hintText: '',
+                                      labelText: '10.65mm to 12.75mm'),
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(
+                                        RegExp('[0-9.,-]+')),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Expanded(
+                          flex: 10, // 80%
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.only(left: 8.0, right: 8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 16.0),
+                                  child: RaisedButton(
+                                    color: AppColors.themeColor,
+                                    onPressed: () {
+                                      _allValuePrint();
+                                      // Validate returns true if the form is valid, or false
+                                      // otherwise.
+                                      if (!_formKey.currentState.validate()) {
+                                        // calculateData();
+                                      } else {
+                                        if (wtwmanualController.text
+                                                    .trim()
+                                                    .length ==
+                                                0 &&
+                                            wtworbscanController.text
+                                                    .trim()
+                                                    .length ==
+                                                0) {
+                                          Common.showErrorToastMsg(
+                                              "MANUAL or ORBSCAN Require");
+                                        } else {
+                                          if (_formKey1.currentState
+                                                  .validate() ||
+                                              _formKey2.currentState
+                                                  .validate()) {
+                                            print("form validate");
+                                            // If the form is valid, display a Snackbar.
+                                            //submitPOpup1();
+                                            double k1val = double.parse(
+                                                k1Controller.text.trim());
+                                            double k2val = double.parse(
+                                                k2Controller.text.trim());
+                                            int k1Degree = int.parse(
+                                                k1axisController.text.trim());
+                                            int k2Degree = int.parse(
+                                                k2axisController.text.trim());
 
-                                    }
-                                    else{
-
-                                      if(wtwmanualController.text.trim().length==0 && wtworbscanController.text.trim().length==0){
-                                        Common.showErrorToastMsg("MANUAL or ORBSCAN Require");
-                                      }
-                                      else{
-                                        if(_formKey1.currentState.validate() || _formKey2.currentState.validate()){
-                                          print("form validate");
-                                          // If the form is valid, display a Snackbar.
-                                          //submitPOpup1();
-                                          double k1val = double.parse(k1Controller.text.trim());
-                                          double k2val = double.parse(k2Controller.text.trim());
-                                          int k1Degree = int.parse(k1axisController.text.trim());
-                                          int k2Degree = int.parse(k2axisController.text.trim());
-
-                                          if(double.parse(preopcylController.text.trim())<0){
+                                            /*   if(double.parse(preopcylController.text.trim())<0){
                                             if(k1val<k2val){
                                               if(k1Degree>=20 || k1Degree<=40){
                                                 submitPOpup1();
@@ -1552,41 +1854,52 @@ class MyCustomFormState extends State<MyCustomForm> {
                                                 submitPOpup1();
                                               }
                                             }
-                                          }
+                                          }*/
 
-                                          double k2axisVal = double.parse(k2axisController.text.trim());
-                                          double k1axisVal = double.parse(k1axisController.text.trim());
-                                          double k1k2axisDiff = k2axisVal - k1axisVal;
-                                          if(k1k2axisDiff==90 || k1k2axisDiff==-90){
-                                            k1k2Popup2();
-                                          }
+                                            double k2axisVal = double.parse(
+                                                k2axisController.text.trim());
+                                            double k1axisVal = double.parse(
+                                                k1axisController.text.trim());
+                                            double k1k2axisDiff =
+                                                k2axisVal - k1axisVal;
+                                            print(k1k2axisDiff.abs());
+                                            if (k1k2axisDiff.abs() != 90) {
+                                              k1k2Popup2();
+                                            }
 
-                                          double acdValue = double.parse(acdController.text.trim());
-                                          if(acdValue>3.5){
-                                            AnteriorChamberPopup();
+                                            double acdValue = double.parse(
+                                                acdController.text.trim());
+                                            if (acdValue >= 3.5) {
+                                              AnteriorChamberPopup();
+                                            } else if (k1k2axisDiff.abs() ==
+                                                90) {
+                                              calculateData();
+                                            }
                                           }
                                         }
                                       }
-                                    }
-                                  },
-                                  child: Text('Calculate',style: TextStyle(color: Colors.white),),
+                                    },
+                                    child: Text(
+                                      'Calculate',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            )
-          ],
-        )
-      ),
+                      ],
+                    ),
+                  ],
+                ),
+              )
+            ],
+          )),
     );
   }
-  _allValuePrint(){
+
+  _allValuePrint() {
     print("name : ${nameController.text}");
     print("birth date : $_date");
     print("patientid : ${patientidController.text}");
@@ -1606,19 +1919,17 @@ class MyCustomFormState extends State<MyCustomForm> {
     print("Anterior chamber depth : ${acdController.text}");
   }
 
-  Widget _oldRadioWidget(){
+  Widget _oldRadioWidget() {
     return Expanded(
       flex: 10, // 80%
       child: Padding(
-        padding:
-        const EdgeInsets.only(left: 8.0, right: 8.0),
+        padding: const EdgeInsets.only(left: 8.0, right: 8.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             RadioListTile(
               groupValue: radioItem,
-              title: Text('Right-eye OD',
-                  style: TextStyle(fontSize: 15.0)),
+              title: Text('Right-eye OD', style: TextStyle(fontSize: 15.0)),
               value: 'right-eye',
               onChanged: (val) {
                 setState(() {
@@ -1642,5 +1953,3 @@ class MyCustomFormState extends State<MyCustomForm> {
     );
   }
 }
-
-
